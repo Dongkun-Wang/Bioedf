@@ -69,10 +69,10 @@ If you need sample data, please contact the author Teddy at `Dongkun.wang@outloo
 
 ## How To Run
 
-Edit [main.py](/Users/teddy/Desktop/Bioprocess/main.py) and set the data directory you want to analyze. By default it resolves the EEG directory automatically:
+Edit [main.py](/Users/teddy/Desktop/Bioprocess/main.py) and set the data directory you want to analyze. By default it points to the EEG directory directly:
 
 ```python
-config["fileinfo"]["fullpath"] = resolve_data_directory("eeg")
+config["fileinfo"]["fullpath"] = "./data/脑电"
 ```
 
 Then run:

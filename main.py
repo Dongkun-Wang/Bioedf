@@ -1,6 +1,6 @@
 """Project entry point."""
 
-from nm_config import nm_config, resolve_data_directory
+from nm_config import nm_config
 from utils.Analysis import util_analysis
 from utils.LoadDataset import util_load_dataset
 from utils.Preprocess import util_preprocess
@@ -9,7 +9,7 @@ from utils.Preprocess import util_preprocess
 def main():
     """Run the end-to-end signal analysis pipeline."""
     config = nm_config()
-    config["fileinfo"]["fullpath"] = resolve_data_directory("eeg")
+    config["fileinfo"]["fullpath"] = "./data/右腿"
 
     # Enable these lines when you want to inspect only part of a recording.
     # config["dataset"]["slice_enabled"] = True

@@ -54,17 +54,6 @@ def infer_signal_modality(file_dir, file_names):
     raise ValueError(f"Unable to infer signal modality from directory name: {file_dir}")
 
 
-def resolve_data_directory(modality, data_root="./data"):
-    """Resolve an English modality name against English or legacy directory names."""
-    root = Path(data_root)
-    aliases = DATASET_DIRECTORY_ALIASES[modality]
-    for alias in aliases:
-        candidate = root / alias
-        if candidate.exists():
-            return str(candidate)
-    return str(root / aliases[0])
-
-
 def nm_config():
     """Build the default runtime configuration."""
     result_dir = Path("./result")
