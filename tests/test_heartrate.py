@@ -1,0 +1,40 @@
+import numpy as np
+
+from utils.Heartrate import heartrate_analysis
+
+
+def _make_noisy_ecg(fs, duration_seconds, beat_times):
+    time_axis = np.arange(0, duration_seconds, 1 / fs)
+    signal = 0.08 * np.sin(2 * np.pi * 0.35 * time_axis)
+    signal += 0.04 * np.sin(2 * np.pi * 0.12 * time_axis + 0.5)
+
+    for beat_time in beat_times:
+        signal += -1.8 * np.exp(-0.5 * ((time_axis - beat_time) / 0.018) ** 2)
+        signal += 0.35 * np.exp(-0.5 * ((time_axis - (beat_time - 0.16)) / 0.04) ** 2)
+        signal += 0.45 * np.exp(-0.5 * ((time_axis - (beat_time + 0.22)) / 0.07) ** 2)
+
+    rng = np.random.default_rng(42)
+    signal += 0.03 * rng.standard_normal(len(time_axis))
+    return signal
+
+
+def test_heartrate_analysis_detects_beats_from_noisy_inverted_ecg():
+    fs = 250
+    beat_times = np.arange(1.0, 9.1, 1.0)
+    ecg_signal = _make_noisy_ecg(fs, duration_seconds=10, beat_times=beat_times)
+    config = {
+        "datainfo": {
+            "Fs": fs,
+            "segment_labels": ["ecg_segment_1"],
+        },
+        "display": {
+            "heart_rate_show": "off",
+        },
+    }
+
+    result = heartrate_analysis([ecg_signal], config)
+
+    assert result["segments"][0]["detected"] is True
+    heart_rate = result["segments"][0]["heart_rate_bpm"]
+    assert len(heart_rate) >= 6
+    assert np.isclose(np.median(heart_rate), 60.0, atol=6.0)
