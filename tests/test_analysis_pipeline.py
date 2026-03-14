@@ -12,10 +12,10 @@ def test_analysis_dispatches_only_enabled_modules(monkeypatch):
         return _stub
 
     monkeypatch.setattr(analysis_module, "heartrate_analysis", _make_stub("heart_rate"))
-    monkeypatch.setattr(analysis_module, "util_fft", _make_stub("fft"))
-    monkeypatch.setattr(analysis_module, "util_stft", _make_stub("stft"))
-    monkeypatch.setattr(analysis_module, "util_band_analysis", _make_stub("band"))
-    monkeypatch.setattr(analysis_module, "util_freq_analysis", _make_stub("freq_alg"))
+    monkeypatch.setattr(analysis_module, "run_fft", _make_stub("fft"))
+    monkeypatch.setattr(analysis_module, "run_stft", _make_stub("stft"))
+    monkeypatch.setattr(analysis_module, "run_band_analysis", _make_stub("band"))
+    monkeypatch.setattr(analysis_module, "run_freq_analysis", _make_stub("freq_analysis"))
 
     config = {
         "analysis": {
@@ -26,7 +26,7 @@ def test_analysis_dispatches_only_enabled_modules(monkeypatch):
         },
     }
 
-    result = analysis_module.util_analysis([[1.0, 2.0, 3.0]], "demo", config)
+    result = analysis_module.run_analysis([[1.0, 2.0, 3.0]], "demo", config)
 
     assert called == ["fft", "band"]
     assert set(result["modules"].keys()) == {"fft", "band"}

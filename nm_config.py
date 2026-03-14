@@ -35,7 +35,7 @@ SIGNAL_PROFILES = {
         "bandpass": [1, 250],
         "bandstop": [48, 52],
         "channel_strategy": "single",
-        "analysis_modules": ["fft", "stft", "freq_alg"],
+        "analysis_modules": ["fft", "stft", "freq_analysis"],
     },
 }
 
@@ -78,8 +78,8 @@ def nm_config():
             "sampling_rate_scale": 8e6 / 42 / 6 / 32 / 1000,
         },
         "preprocess": {
-            "bpfilter": "on",
-            "bsfilter": "on",
+            "bpfilter": True,
+            "bsfilter": True,
             # Filled automatically after modality inference:
             # EEG 1-60 Hz, ECG 1-10 Hz, EMG 1-250 Hz.
             "bpfreq": None,
@@ -91,24 +91,24 @@ def nm_config():
             "enabled_modules": [],
             "fft_type": "log",
             "stft_overlap": 0.5,
+            # Match the original STFT behavior by averaging median frequency over ~20 s windows.
             "avg_segment_len": 20,
             "band_freq_limit": 60,
             "rms_time": 1.0,
             "rms_gap": 0.5,
-            "calorie_tool": "off",
             "calorie_power_ratio": 25,
         },
         "display": {
-            "preprocess_show": "on",
-            "preprocess_save": "off",
-            "heart_rate_show": "on",
-            "fft_show": "on",
-            "fft_save": "off",
-            "stft_show": "on",
+            "preprocess_show": True,
+            "preprocess_save": False,
+            "heart_rate_show": True,
+            "fft_show": True,
+            "fft_save": False,
+            "stft_show": True,
             "median_freq_plot": True,
-            "band_show": "on",
-            "band_save_csv": "off",
-            "freqalg_show": "on",
-            "calorie_show": "off",
+            "band_show": True,
+            "band_save_csv": False,
+            "freq_analysis_show": True,
+            "calorie_show": False,
         },
     }

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import butter, sosfilt
 
-from utils.console import print_kv, print_section, print_subsection, print_success
+from utils.ui import as_bool, finish_figure, print_kv, print_section, print_subsection, print_success, style_axes
 
 
 def _validate_filter_config(freq, fs, name):
@@ -32,10 +32,10 @@ def _apply_filter(data, btype, freq, fs, order):
     return sosfilt(sos, data)
 
 
-def util_preprocess(config, dataset, show=None, saveon=None):
+def preprocess_dataset(config, dataset, show=None, saveon=None):
     """Filter each 1D segment according to the resolved preprocessing config."""
-    show = config["display"].get("preprocess_show", "off") if show is None else show
-    saveon = config["display"].get("preprocess_save", "off") if saveon is None else saveon
+    show = as_bool(config["display"].get("preprocess_show", False) if show is None else show)
+    saveon = as_bool(config["display"].get("preprocess_save", False) if saveon is None else saveon)
     fs = config["datainfo"]["Fs"]
     segment_labels = config["datainfo"].get("segment_labels", [])
     result_dir = config["fileinfo"].get("result_dir", "./result")
@@ -48,7 +48,7 @@ def util_preprocess(config, dataset, show=None, saveon=None):
         ("bsfilter", "bs", "Band-stop"),
     ]
     for filter_field, filter_prefix, filter_name in filters:
-        if config["preprocess"].get(filter_field, "off") == "on":
+        if as_bool(config["preprocess"].get(filter_field, False)):
             filter_freq = config["preprocess"].get(f"{filter_prefix}freq")
             filter_order = config["preprocess"].get(f"{filter_prefix}filtord", 4)
             print_kv(f"{filter_name} range", filter_freq)
@@ -57,7 +57,7 @@ def util_preprocess(config, dataset, show=None, saveon=None):
     dataset_filtered = []
     for idx, signal in enumerate(dataset):
         filtered_signal = np.asarray(signal, dtype=float)
-        if config["preprocess"].get("bpfilter", "off") == "on":
+        if as_bool(config["preprocess"].get("bpfilter", False)):
             filtered_signal = _apply_filter(
                 filtered_signal,
                 "bandpass",
@@ -65,7 +65,7 @@ def util_preprocess(config, dataset, show=None, saveon=None):
                 fs,
                 config["preprocess"].get("bpfiltord", 4),
             )
-        if config["preprocess"].get("bsfilter", "off") == "on":
+        if as_bool(config["preprocess"].get("bsfilter", False)):
             filtered_signal = _apply_filter(
                 filtered_signal,
                 "bandstop",
@@ -75,21 +75,15 @@ def util_preprocess(config, dataset, show=None, saveon=None):
             )
         dataset_filtered.append(filtered_signal)
 
-        if show == "on" or saveon == "on":
+        if show or saveon:
             label = segment_labels[idx] if idx < len(segment_labels) else f"segment_{idx + 1}"
             timeline = np.arange(len(filtered_signal)) / fs
-            plt.figure(figsize=(12, 4))
-            plt.plot(timeline, filtered_signal)
-            plt.title(f"{label} filtered signal")
-            plt.xlabel("Time (s)")
-            plt.ylabel("Amplitude")
-            plt.tight_layout()
-            if saveon == "on":
-                os.makedirs(result_dir, exist_ok=True)
-                plt.savefig(os.path.join(result_dir, f"{label}_filtered.pdf"))
-            if show == "on":
-                plt.show()
-            plt.close()
+            # TODO: Visualization styling lives here so it can be tuned globally later.
+            fig, ax = plt.subplots(figsize=(12, 4.5))
+            ax.plot(timeline, filtered_signal, color="#1f4e79", linewidth=1.6)
+            style_axes(ax, f"{label} Filtered Signal", "Time (s)", "Amplitude")
+            save_path = os.path.join(result_dir, f"{label}_filtered.pdf") if saveon else None
+            finish_figure(fig, save_path=save_path, show=show)
 
     print_success("Preprocessing finished.")
     return dataset_filtered

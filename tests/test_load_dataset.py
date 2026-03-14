@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from nm_config import nm_config
-from utils.LoadDataset import util_load_dataset
+from utils.LoadDataset import load_dataset
 
 
 def _write_signal_csv(path, start_dt, values):
@@ -27,7 +27,7 @@ def test_load_dataset_reads_headerless_csv_without_losing_first_row(tmp_path):
     config["dataset"]["source_sampling_rate"] = 1
     config["dataset"]["sampling_rate_scale"] = 1
     config["dataset"]["segment_duration_seconds"] = 0
-    dataset, updated_config = util_load_dataset(config)
+    dataset, updated_config = load_dataset(config)
 
     assert len(dataset) == 1
     assert np.allclose(dataset[0], np.array([1.0, 2.0, 3.0]))
@@ -51,7 +51,7 @@ def test_load_dataset_supports_time_slice_and_segmentation(tmp_path):
     config["dataset"]["slice_start"] = "17:17:10"
     config["dataset"]["slice_end"] = "17:17:12"
     config["dataset"]["segment_duration_seconds"] = 2
-    dataset, updated_config = util_load_dataset(config)
+    dataset, updated_config = load_dataset(config)
 
     assert len(dataset) == 2
     assert np.allclose(dataset[0], np.array([4.0, 5.0]))
@@ -74,7 +74,7 @@ def test_load_dataset_auto_detects_eeg_and_averages_to_single_channel(tmp_path):
     config["dataset"]["source_sampling_rate"] = 100
     config["dataset"]["sampling_rate_scale"] = 1
     config["dataset"]["segment_duration_seconds"] = 0
-    dataset, updated_config = util_load_dataset(config)
+    dataset, updated_config = load_dataset(config)
 
     assert len(dataset) == 1
     assert updated_config["datainfo"]["signal_type"] == "eeg"
@@ -99,14 +99,14 @@ def test_load_dataset_auto_detects_ecg_and_emg_profiles(tmp_path):
     ecg_config["dataset"]["source_sampling_rate"] = 1000
     ecg_config["dataset"]["sampling_rate_scale"] = 1
     ecg_config["dataset"]["segment_duration_seconds"] = 0
-    ecg_dataset, ecg_updated = util_load_dataset(ecg_config)
+    ecg_dataset, ecg_updated = load_dataset(ecg_config)
 
     emg_config = nm_config()
     emg_config["fileinfo"]["fullpath"] = str(emg_dir)
     emg_config["dataset"]["source_sampling_rate"] = 1000
     emg_config["dataset"]["sampling_rate_scale"] = 1
     emg_config["dataset"]["segment_duration_seconds"] = 0
-    emg_dataset, emg_updated = util_load_dataset(emg_config)
+    emg_dataset, emg_updated = load_dataset(emg_config)
 
     assert len(ecg_dataset) == 1
     assert ecg_updated["datainfo"]["signal_type"] == "ecg"

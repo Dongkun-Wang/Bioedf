@@ -8,4 +8,4 @@ def test_config_contains_required_defaults():
     assert config["analysis"]["enabled_modules"] == []
     assert config["analysis"]["rms_time"] > 0
     assert config["analysis"]["rms_gap"] > 0
-    assert config["display"]["preprocess_show"] == "on"
+    assert config["display"]["preprocess_show"] is True

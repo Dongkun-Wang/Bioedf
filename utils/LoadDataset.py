@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from nm_config import infer_signal_modality
-from utils.console import print_kv, print_section, print_status, print_subsection, print_success
+from utils.ui import print_kv, print_section, print_status, print_subsection, print_success
 
 
 def _format_datetime(value):
@@ -81,7 +81,7 @@ def _apply_channel_strategy(signals, channel_names, config):
     return signals, channel_names
 
 
-def util_load_dataset(config):
+def load_dataset(config):
     """Load headerless CSV recordings and normalize them into 1D segments."""
     config.setdefault("datainfo", {})
     file_dir = config["fileinfo"]["fullpath"]

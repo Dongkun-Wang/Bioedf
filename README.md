@@ -19,7 +19,7 @@ Bioprocess is a lightweight offline biosignal analysis pipeline for EEG, ECG, an
 - Automatic modality inference with support for both English folder names and legacy directory names.
 - EEG multi-channel averaging to a single analysis channel before downstream processing.
 - Structured analysis outputs returned from every module.
-- Consistent terminal reporting with shared console formatting instead of ad hoc separator lines.
+- Consistent terminal reporting and plot styling through shared UI helpers instead of ad hoc formatting.
 - Plotting and result saving controlled through a single configuration object.
 - Regression tests covering config defaults, dataset loading, analysis dispatch, and ECG peak detection.
 
@@ -40,7 +40,7 @@ Bioprocess/
 │   ├── LoadDataset.py
 │   ├── Preprocess.py
 │   ├── STFT.py
-│   └── console.py
+│   └── ui.py
 ├── main.py                # Entry point
 ├── nm_config.py           # Defaults and modality inference
 └── requirements.txt

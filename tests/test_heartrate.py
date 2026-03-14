@@ -28,7 +28,7 @@ def test_heartrate_analysis_detects_beats_from_noisy_inverted_ecg():
             "segment_labels": ["ecg_segment_1"],
         },
         "display": {
-            "heart_rate_show": "off",
+            "heart_rate_show": False,
         },
     }
 

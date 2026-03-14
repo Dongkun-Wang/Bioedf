@@ -5,7 +5,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 from scipy.signal import find_peaks
 
-from utils.console import print_kv, print_status, print_success, print_subsection
+from utils.ui import as_bool, finish_figure, print_kv, print_status, print_subsection, print_success, style_axes
 
 
 def _robust_scale(values):
@@ -65,7 +65,7 @@ def _detect_r_peaks(signal, fs):
 def heartrate_analysis(dataset, config):
     """Compute RR intervals, heart rate, and HRV metrics for each ECG segment."""
     fs = float(config["datainfo"]["Fs"])
-    show = config["display"].get("heart_rate_show", "off")
+    show = as_bool(config["display"].get("heart_rate_show", False))
     segment_labels = config["datainfo"].get("segment_labels", [])
 
     print_subsection("Heart Rate")
@@ -90,18 +90,14 @@ def heartrate_analysis(dataset, config):
         print_kv(f"{label} SDNN", f"{sdnn:.2f} ms")
         print_kv(f"{label} RMSSD", f"{rmssd:.2f} ms")
 
-        if show == "on":
-            plt.figure(figsize=(10, 4))
-            plt.plot(time_hr, heart_rate, color="royalblue", linewidth=2, label=label)
-            plt.xlabel("Time (s)")
-            plt.ylabel("Heart Rate (bpm)")
-            plt.title(f"Heart Rate - {label}")
-            plt.grid(True, linestyle="--", alpha=0.6)
-            plt.legend(loc="upper right", frameon=False)
-            plt.gca().yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-            plt.tight_layout()
-            plt.show()
-            plt.close()
+        if show:
+            # TODO: Visualization styling lives here so it can be tuned globally later.
+            fig, ax = plt.subplots(figsize=(10.5, 4.5))
+            ax.plot(time_hr, heart_rate, color="#c84c09", linewidth=2.0, label=label)
+            style_axes(ax, f"Heart Rate - {label}", "Time (s)", "Heart Rate (bpm)")
+            ax.legend(loc="upper right", frameon=False)
+            ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+            finish_figure(fig, show=True)
 
         results.append(
             {

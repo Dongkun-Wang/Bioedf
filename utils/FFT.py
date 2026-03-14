@@ -1,19 +1,17 @@
 """FFT-based spectrum analysis."""
 
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils.console import print_status, print_success, print_subsection
+from utils.ui import as_bool, finish_figure, print_status, print_subsection, print_success, style_axes
 
 
-def util_fft(dataset, data_title, config):
+def run_fft(dataset, data_title, config):
     """Run FFT for every segment and optionally plot or save the spectrum."""
     fs = float(config["datainfo"]["Fs"])
-    fftshow = config["display"].get("fft_show", "off")
+    fftshow = as_bool(config["display"].get("fft_show", False))
     ffttype = config["analysis"].get("fft_type", "log")
-    fftsave = config["display"].get("fft_save", "off")
+    fftsave = as_bool(config["display"].get("fft_save", False))
     result_dir = config["fileinfo"].get("result_dir", "./result")
     segment_labels = config["datainfo"].get("segment_labels", [])
 
@@ -45,27 +43,22 @@ def util_fft(dataset, data_title, config):
             }
         )
 
-        if fftshow == "on" or fftsave == "on":
-            plt.figure(figsize=(10, 4))
+        if fftshow or fftsave:
+            # TODO: Visualization styling lives here so it can be tuned globally later.
+            fig, ax = plt.subplots(figsize=(10.5, 4.5))
             if ffttype == "log":
                 plot_y = 10 * np.log10(power + 1e-12)
-                plt.ylabel("Power (dB)")
-                plt.xlim(0, fs / 2)
+                ylabel = "Power (dB)"
+                ax.set_xlim(0, fs / 2)
             else:
                 plot_y = power
-                plt.ylabel("Power")
-                plt.xlim(0, min(30, fs / 2))
+                ylabel = "Power"
+                ax.set_xlim(0, min(30, fs / 2))
 
-            plt.plot(frequency, plot_y)
-            plt.title(f"{label} {data_title} FFT")
-            plt.xlabel("Frequency (Hz)")
-            plt.tight_layout()
-            if fftsave == "on":
-                os.makedirs(result_dir, exist_ok=True)
-                plt.savefig(os.path.join(result_dir, f"{label}_{data_title}_fft.pdf"))
-            if fftshow == "on":
-                plt.show()
-            plt.close()
+            ax.plot(frequency, plot_y, color="#0b6e4f", linewidth=1.6)
+            style_axes(ax, f"{label} {data_title} FFT", "Frequency (Hz)", ylabel)
+            save_path = os.path.join(result_dir, f"{label}_{data_title}_fft.pdf") if fftsave else None
+            finish_figure(fig, save_path=save_path, show=fftshow)
 
     print_success("FFT finished.")
     return {"segments": fft_results}

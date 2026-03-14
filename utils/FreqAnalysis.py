@@ -5,15 +5,15 @@ import numpy as np
 from scipy.fft import fft
 from scipy.signal.windows import hann
 
-from utils.console import print_status, print_success, print_subsection
+from utils.ui import as_bool, finish_figure, print_status, print_subsection, print_success, style_axes
 
 
-def util_freq_analysis(dataset, data_title, config):
+def run_freq_analysis(dataset, data_title, config):
     """Compute sliding-window RMS, MPF, and MDF for every segment."""
     fs = float(config["datainfo"]["Fs"])
     seq_len = max(1, int(fs * float(config["analysis"].get("rms_time", 1.0))))
     seq_gap = max(1, int(fs * float(config["analysis"].get("rms_gap", 0.5))))
-    show = config["display"].get("freqalg_show", "off")
+    show = as_bool(config["display"].get("freq_analysis_show", False))
     segment_labels = config["datainfo"].get("segment_labels", [])
 
     print_subsection("Frequency Summary")
@@ -47,33 +47,24 @@ def util_freq_analysis(dataset, data_title, config):
             rms.append(float(np.sqrt(np.mean(np.abs(segment) ** 2))))
             time_s.append(start / fs)
 
-        if show == "on":
-            plt.figure(figsize=(10, 4))
-            plt.plot(time_s, rms)
-            plt.title(f"{label} {data_title} RMS")
-            plt.xlabel("Time (s)")
-            plt.ylabel("RMS")
-            plt.tight_layout()
-            plt.show()
-            plt.close()
+        if show:
+            # TODO: Visualization styling lives here so it can be tuned globally later.
+            fig_rms, ax_rms = plt.subplots(figsize=(10.5, 4.5))
+            ax_rms.plot(time_s, rms, color="#6b4c9a", linewidth=1.7)
+            style_axes(ax_rms, f"{label} {data_title} RMS", "Time (s)", "RMS")
+            finish_figure(fig_rms, show=True)
 
-            plt.figure(figsize=(10, 4))
-            plt.plot(time_s, mpf)
-            plt.title(f"{label} {data_title} MPF")
-            plt.xlabel("Time (s)")
-            plt.ylabel("Frequency (Hz)")
-            plt.tight_layout()
-            plt.show()
-            plt.close()
+            # TODO: Visualization styling lives here so it can be tuned globally later.
+            fig_mpf, ax_mpf = plt.subplots(figsize=(10.5, 4.5))
+            ax_mpf.plot(time_s, mpf, color="#0b6e4f", linewidth=1.7)
+            style_axes(ax_mpf, f"{label} {data_title} MPF", "Time (s)", "Frequency (Hz)")
+            finish_figure(fig_mpf, show=True)
 
-            plt.figure(figsize=(10, 4))
-            plt.plot(time_s, mdf)
-            plt.title(f"{label} {data_title} MDF")
-            plt.xlabel("Time (s)")
-            plt.ylabel("Frequency (Hz)")
-            plt.tight_layout()
-            plt.show()
-            plt.close()
+            # TODO: Visualization styling lives here so it can be tuned globally later.
+            fig_mdf, ax_mdf = plt.subplots(figsize=(10.5, 4.5))
+            ax_mdf.plot(time_s, mdf, color="#c84c09", linewidth=1.7)
+            style_axes(ax_mdf, f"{label} {data_title} MDF", "Time (s)", "Frequency (Hz)")
+            finish_figure(fig_mdf, show=True)
 
         results.append(
             {

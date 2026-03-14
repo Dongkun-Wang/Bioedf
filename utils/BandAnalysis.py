@@ -8,15 +8,15 @@ import pandas as pd
 from scipy.signal import spectrogram
 from scipy.stats import entropy
 
-from utils.console import print_status, print_success, print_subsection
+from utils.ui import as_bool, finish_figure, print_status, print_subsection, print_success, style_axes
 
 
-def util_band_analysis(dataset, data_title, config):
+def run_band_analysis(dataset, data_title, config):
     """Compute EEG band-power metrics and derived concentration/relaxation indices."""
     fs = float(config["datainfo"]["Fs"])
     segment_labels = config["datainfo"].get("segment_labels", [])
-    show = config["display"].get("band_show", "on")
-    save_csv = config["display"].get("band_save_csv", "off")
+    show = as_bool(config["display"].get("band_show", True))
+    save_csv = as_bool(config["display"].get("band_save_csv", False))
     result_dir = config["fileinfo"].get("result_dir", "./result")
     freq_limit = float(config["analysis"].get("band_freq_limit", 60))
 
@@ -54,8 +54,9 @@ def util_band_analysis(dataset, data_title, config):
         total_power = np.where(total_power == 0, 1e-12, total_power)
 
         metrics = pd.DataFrame(index=times)
-        if show == "on":
-            plt.figure(figsize=(12, 4))
+        if show:
+            # TODO: Visualization styling lives here so it can be tuned globally later.
+            fig_power, ax_power = plt.subplots(figsize=(12, 4.5))
 
         for band_name, band_range in freq_bands.items():
             band_idx = np.where((freqs >= band_range[0]) & (freqs < band_range[1]))[0]
@@ -67,8 +68,8 @@ def util_band_analysis(dataset, data_title, config):
             metrics[band_name] = band_power
             metrics[f"{band_name}_rel"] = band_power / total_power
 
-            if show == "on":
-                plt.plot(times, band_power, label=f"{band_name} {band_range[0]}-{band_range[1]} Hz")
+            if show:
+                ax_power.plot(times, band_power, linewidth=1.5, label=f"{band_name} {band_range[0]}-{band_range[1]} Hz")
 
         # Derived metrics summarize where the spectrum is centered and how spread it is.
         spectrum_sum = np.sum(spectrum, axis=0) + 1e-12
@@ -85,30 +86,22 @@ def util_band_analysis(dataset, data_title, config):
             metrics["alpha"] + metrics["beta_low"] + metrics["beta_high"] + metrics["theta"] + 1e-12
         )
 
-        if save_csv == "on":
+        if save_csv:
             os.makedirs(result_dir, exist_ok=True)
             metrics.to_csv(os.path.join(result_dir, f"{label}_{data_title}_band_metrics.csv"))
 
-        if show == "on":
-            plt.xlabel("Time (s)")
-            plt.ylabel("Power")
-            plt.title(f"{label} {data_title} Frequency Band Comparison")
-            plt.legend()
-            plt.tight_layout()
-            plt.show()
-            plt.close()
+        if show:
+            style_axes(ax_power, f"{label} {data_title} Frequency Band Comparison", "Time (s)", "Power")
+            ax_power.legend(frameon=False, ncol=2)
+            finish_figure(fig_power, show=True)
 
-            plt.figure(figsize=(12, 4))
-            plt.plot(metrics.index, metrics["concentration"], label="Concentration", color="blue")
-            plt.plot(metrics.index, metrics["relaxation"], label="Relaxation", color="green")
-            plt.xlabel("Time (s)")
-            plt.ylabel("Index")
-            plt.title(f"{label} {data_title} Derived Band Indices")
-            plt.legend()
-            plt.grid(True)
-            plt.tight_layout()
-            plt.show()
-            plt.close()
+            # TODO: Visualization styling lives here so it can be tuned globally later.
+            fig_index, ax_index = plt.subplots(figsize=(12, 4.5))
+            ax_index.plot(metrics.index, metrics["concentration"], label="Concentration", color="#245caa", linewidth=1.8)
+            ax_index.plot(metrics.index, metrics["relaxation"], label="Relaxation", color="#3b8f57", linewidth=1.8)
+            style_axes(ax_index, f"{label} {data_title} Derived Band Indices", "Time (s)", "Index")
+            ax_index.legend(frameon=False)
+            finish_figure(fig_index, show=True)
 
         segment_results.append(
             {

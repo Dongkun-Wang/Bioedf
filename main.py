@@ -1,9 +1,9 @@
 """Project entry point."""
 
 from nm_config import nm_config
-from utils.Analysis import util_analysis
-from utils.LoadDataset import util_load_dataset
-from utils.Preprocess import util_preprocess
+from utils.Analysis import run_analysis
+from utils.LoadDataset import load_dataset
+from utils.Preprocess import preprocess_dataset
 
 
 def main():
@@ -16,9 +16,9 @@ def main():
     # config["dataset"]["slice_start"] = "17:17:10"
     # config["dataset"]["slice_end"] = "17:19:30"
 
-    dataset, config = util_load_dataset(config)
-    filtered_dataset = util_preprocess(config, dataset)
-    return util_analysis(filtered_dataset, "filtered_dataset", config)
+    dataset, config = load_dataset(config)
+    filtered_dataset = preprocess_dataset(config, dataset)
+    return run_analysis(filtered_dataset, "filtered_dataset", config)
 
 
 if __name__ == "__main__":
