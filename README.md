@@ -2,6 +2,18 @@
 
 Bioprocess is a lightweight offline biosignal analysis pipeline for EEG, ECG, and EMG recordings stored as headerless CSV files. It loads raw signals, infers the signal modality automatically, applies modality-specific filtering, runs the appropriate analyses, and optionally visualizes or saves the results.
 
+## Fast Onboarding
+
+If you need to understand the project quickly, read the files in this order:
+
+1. [main.py](/Users/teddy/Desktop/Bioprocess/main.py)
+2. [nm_config.py](/Users/teddy/Desktop/Bioprocess/nm_config.py)
+3. [utils/LoadDataset.py](/Users/teddy/Desktop/Bioprocess/utils/LoadDataset.py)
+4. [utils/Preprocess.py](/Users/teddy/Desktop/Bioprocess/utils/Preprocess.py)
+5. [utils/Analysis.py](/Users/teddy/Desktop/Bioprocess/utils/Analysis.py)
+
+That sequence gives the full runtime flow from input selection to analysis dispatch.
+
 ## What The System Does
 
 - Loads one directory of CSV recordings at a time.
@@ -13,6 +25,21 @@ Bioprocess is a lightweight offline biosignal analysis pipeline for EEG, ECG, an
   - EEG -> band analysis
   - ECG -> heart-rate and HRV analysis
   - EMG -> FFT, STFT, and sliding-window frequency metrics
+
+## Pipeline Overview
+
+The runtime pipeline is:
+
+1. `main.py` selects the data directory and optional time window.
+2. `LoadDataset.py` reads all CSV files in that directory.
+3. The signal modality is inferred automatically from folder and file names.
+4. Modality-specific defaults are injected into the config:
+   - filter band
+   - channel handling strategy
+   - enabled analysis modules
+5. EEG is averaged from five channels to a single analysis channel.
+6. The signal is sliced, segmented, filtered, and then dispatched to the enabled analyses.
+7. Figures and tables are shown or saved based on `display` and `output`.
 
 ## Highlights
 
@@ -122,6 +149,12 @@ Automatic analysis selection is also tied to the inferred modality:
 - ECG -> `Heartrate`
 - EMG -> `FFT`, `STFT`, and `FreqAnalysis`
 
+Important:
+
+- Automatic modality inference is the only supported workflow.
+- Manual modality selection is intentionally not part of the current design.
+- EEG is intentionally reduced to one averaged channel before downstream analysis.
+
 ## Output Controls
 
 Runtime behavior is configured through [nm_config.py](/Users/teddy/Desktop/Bioprocess/nm_config.py):
@@ -146,6 +179,29 @@ Saved figures are organized automatically under:
 result/
 └── <MODALITY>/
     └── <module>/
+```
+
+## Common Edit Points
+
+The most common places to change behavior are:
+
+- [main.py](/Users/teddy/Desktop/Bioprocess/main.py)
+  - change the target data directory
+  - enable or disable a time slice
+- [nm_config.py](/Users/teddy/Desktop/Bioprocess/nm_config.py)
+  - change segmentation length
+  - change figure export settings
+  - adjust filter order
+  - tune STFT overlap or EMG sliding-window parameters
+
+The most common runtime settings are:
+
+```python
+config["fileinfo"]["fullpath"] = "./data/脑电"
+config["dataset"]["slice_enabled"] = True
+config["dataset"]["slice_start"] = "17:17:10"
+config["dataset"]["slice_end"] = "17:19:30"
+config["output"]["save_figures"] = True
 ```
 
 ## Main Analysis Modules
@@ -177,6 +233,27 @@ The default window settings are chosen to balance temporal detail and stable fre
 - MDF trend line
   - The raw MDF result is kept unchanged.
   - The plotted red trend line is a display-only moving average with a default width of `5 s`.
+
+## Numerical And Design Notes
+
+These details matter if you want to preserve behavior:
+
+- The sampling-rate scaling formula is intentionally preserved from the original project.
+- EEG averaging to a single channel is intentional and affects all downstream EEG analyses.
+- STFT now focuses on spectrogram visualization plus energy estimation.
+- `FreqAnalysis` keeps raw `RMS`, `MPF`, and `MDF`, but only `RMS + MDF` are plotted by default.
+- The red MDF line is a display-only trend, not a replacement for raw MDF.
+- ECG peak detection has been made more robust than the original version, so heart-rate and HRV results may differ slightly from the legacy code.
+
+If exact historical reproduction is important, review ECG peak handling and filter settings first.
+
+## Things Not To Change Lightly
+
+- `dataset["sampling_rate_scale"]`
+- modality keywords in `SIGNAL_PROFILES`
+- EEG `channel_strategy = "average_to_single"`
+- ECG R-peak detection logic in [utils/Heartrate.py](/Users/teddy/Desktop/Bioprocess/utils/Heartrate.py)
+- automatic module mapping in `SIGNAL_PROFILES`
 
 ## Testing
 
