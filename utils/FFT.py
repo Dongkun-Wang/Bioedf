@@ -3,16 +3,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils.ui import as_bool, finish_figure, print_status, print_subsection, print_success, style_axes
+from utils.ui import add_series, as_bool, finish_figure, make_plot_title, print_status, print_subsection, print_success, style_axes
 
 
 def run_fft(dataset, data_title, config):
     """Run FFT for every segment and optionally plot or save the spectrum."""
     fs = float(config["datainfo"]["Fs"])
-    fftshow = as_bool(config["display"].get("fft_show", False))
+    display_config = config.get("display", {})
+    output_config = config.get("output", {})
+    fftshow = as_bool(display_config.get("fft_show", False))
     ffttype = config["analysis"].get("fft_type", "log")
-    fftsave = as_bool(config["display"].get("fft_save", False))
-    result_dir = config["fileinfo"].get("result_dir", "./result")
+    fftsave = as_bool(output_config.get("save_figures", False))
     segment_labels = config["datainfo"].get("segment_labels", [])
 
     print_subsection("FFT")
@@ -49,16 +50,23 @@ def run_fft(dataset, data_title, config):
             if ffttype == "log":
                 plot_y = 10 * np.log10(power + 1e-12)
                 ylabel = "Power (dB)"
-                ax.set_xlim(0, fs / 2)
             else:
                 plot_y = power
                 ylabel = "Power"
-                ax.set_xlim(0, min(30, fs / 2))
+            high_cut = float(config["preprocess"].get("bpfreq", [0, fs / 2])[1])
+            ax.set_xlim(0, min(fs / 2, max(30.0, high_cut * 1.15)))
 
-            ax.plot(frequency, plot_y, color="#0b6e4f", linewidth=1.6)
-            style_axes(ax, f"{label} {data_title} FFT", "Frequency (Hz)", ylabel)
-            save_path = os.path.join(result_dir, f"{label}_{data_title}_fft.pdf") if fftsave else None
-            finish_figure(fig, save_path=save_path, show=fftshow)
+            add_series(ax, frequency, plot_y, color="#0f766e", linewidth=1.7)
+            style_axes(ax, make_plot_title(config, label, "FFT Spectrum"), "Frequency (Hz)", ylabel)
+            finish_figure(
+                fig,
+                config=config,
+                module_name="fft",
+                label=label,
+                data_title=data_title,
+                figure_name="spectrum",
+                show=fftshow,
+            )
 
     print_success("FFT finished.")
     return {"segments": fft_results}

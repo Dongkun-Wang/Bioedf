@@ -8,15 +8,28 @@ import pandas as pd
 from scipy.signal import spectrogram
 from scipy.stats import entropy
 
-from utils.ui import as_bool, finish_figure, print_status, print_subsection, print_success, style_axes
+from utils.ui import (
+    add_series,
+    as_bool,
+    finish_figure,
+    humanize_text,
+    make_plot_title,
+    print_status,
+    print_subsection,
+    print_success,
+    style_axes,
+)
 
 
 def run_band_analysis(dataset, data_title, config):
     """Compute EEG band-power metrics and derived concentration/relaxation indices."""
     fs = float(config["datainfo"]["Fs"])
     segment_labels = config["datainfo"].get("segment_labels", [])
-    show = as_bool(config["display"].get("band_show", True))
-    save_csv = as_bool(config["display"].get("band_save_csv", False))
+    display_config = config.get("display", {})
+    output_config = config.get("output", {})
+    show = as_bool(display_config.get("band_show", True))
+    save_figures = as_bool(output_config.get("save_figures", False))
+    save_csv = as_bool(output_config.get("save_band_metrics_csv", False))
     result_dir = config["fileinfo"].get("result_dir", "./result")
     freq_limit = float(config["analysis"].get("band_freq_limit", 60))
 
@@ -31,6 +44,13 @@ def run_band_analysis(dataset, data_title, config):
         "beta_low": (14, 25),
         "beta_high": (25, 35),
         "gamma": (35, 60),
+    }
+    band_colors = {
+        "theta": "#1f3c88",
+        "alpha": "#0f766e",
+        "beta_low": "#4c956c",
+        "beta_high": "#c98c1d",
+        "gamma": "#a63446",
     }
 
     segment_results = []
@@ -54,7 +74,9 @@ def run_band_analysis(dataset, data_title, config):
         total_power = np.where(total_power == 0, 1e-12, total_power)
 
         metrics = pd.DataFrame(index=times)
-        if show:
+        render_power = show or save_figures
+        render_indices = show or save_figures
+        if render_power:
             # TODO: Visualization styling lives here so it can be tuned globally later.
             fig_power, ax_power = plt.subplots(figsize=(12, 4.5))
 
@@ -68,8 +90,15 @@ def run_band_analysis(dataset, data_title, config):
             metrics[band_name] = band_power
             metrics[f"{band_name}_rel"] = band_power / total_power
 
-            if show:
-                ax_power.plot(times, band_power, linewidth=1.5, label=f"{band_name} {band_range[0]}-{band_range[1]} Hz")
+            if render_power:
+                add_series(
+                    ax_power,
+                    times,
+                    band_power,
+                    color=band_colors[band_name],
+                    label=f"{humanize_text(band_name).title()} {band_range[0]}-{band_range[1]} Hz",
+                    linewidth=1.6,
+                )
 
         # Derived metrics summarize where the spectrum is centered and how spread it is.
         spectrum_sum = np.sum(spectrum, axis=0) + 1e-12
@@ -90,18 +119,51 @@ def run_band_analysis(dataset, data_title, config):
             os.makedirs(result_dir, exist_ok=True)
             metrics.to_csv(os.path.join(result_dir, f"{label}_{data_title}_band_metrics.csv"))
 
-        if show:
-            style_axes(ax_power, f"{label} {data_title} Frequency Band Comparison", "Time (s)", "Power")
+        if render_power:
+            style_axes(ax_power, make_plot_title(config, label, "Band Power"), "Time (s)", "Power")
+            ax_power.set_ylim(bottom=0)
             ax_power.legend(frameon=False, ncol=2)
-            finish_figure(fig_power, show=True)
+            finish_figure(
+                fig_power,
+                config=config,
+                module_name="band",
+                label=label,
+                data_title=data_title,
+                figure_name="band_power",
+                show=show,
+            )
 
+        if render_indices:
             # TODO: Visualization styling lives here so it can be tuned globally later.
             fig_index, ax_index = plt.subplots(figsize=(12, 4.5))
-            ax_index.plot(metrics.index, metrics["concentration"], label="Concentration", color="#245caa", linewidth=1.8)
-            ax_index.plot(metrics.index, metrics["relaxation"], label="Relaxation", color="#3b8f57", linewidth=1.8)
-            style_axes(ax_index, f"{label} {data_title} Derived Band Indices", "Time (s)", "Index")
+            add_series(
+                ax_index,
+                metrics.index,
+                metrics["concentration"],
+                label="Concentration",
+                color="#1f3c88",
+                linewidth=1.9,
+            )
+            add_series(
+                ax_index,
+                metrics.index,
+                metrics["relaxation"],
+                label="Relaxation",
+                color="#4c956c",
+                linewidth=1.9,
+            )
+            style_axes(ax_index, make_plot_title(config, label, "Derived Indices"), "Time (s)", "Index")
+            ax_index.set_ylim(bottom=0)
             ax_index.legend(frameon=False)
-            finish_figure(fig_index, show=True)
+            finish_figure(
+                fig_index,
+                config=config,
+                module_name="band",
+                label=label,
+                data_title=data_title,
+                figure_name="indices",
+                show=show,
+            )
 
         segment_results.append(
             {

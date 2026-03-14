@@ -5,7 +5,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 from scipy.signal import find_peaks
 
-from utils.ui import as_bool, finish_figure, print_kv, print_status, print_subsection, print_success, style_axes
+from utils.ui import add_series, as_bool, finish_figure, make_plot_title, print_kv, print_status, print_subsection, print_success, style_axes
 
 
 def _robust_scale(values):
@@ -65,7 +65,10 @@ def _detect_r_peaks(signal, fs):
 def heartrate_analysis(dataset, config):
     """Compute RR intervals, heart rate, and HRV metrics for each ECG segment."""
     fs = float(config["datainfo"]["Fs"])
-    show = as_bool(config["display"].get("heart_rate_show", False))
+    display_config = config.get("display", {})
+    output_config = config.get("output", {})
+    show = as_bool(display_config.get("heart_rate_show", False))
+    save_figures = as_bool(output_config.get("save_figures", False))
     segment_labels = config["datainfo"].get("segment_labels", [])
 
     print_subsection("Heart Rate")
@@ -90,14 +93,20 @@ def heartrate_analysis(dataset, config):
         print_kv(f"{label} SDNN", f"{sdnn:.2f} ms")
         print_kv(f"{label} RMSSD", f"{rmssd:.2f} ms")
 
-        if show:
+        if show or save_figures:
             # TODO: Visualization styling lives here so it can be tuned globally later.
             fig, ax = plt.subplots(figsize=(10.5, 4.5))
-            ax.plot(time_hr, heart_rate, color="#c84c09", linewidth=2.0, label=label)
-            style_axes(ax, f"Heart Rate - {label}", "Time (s)", "Heart Rate (bpm)")
-            ax.legend(loc="upper right", frameon=False)
+            add_series(ax, time_hr, heart_rate, color="#a63446", linewidth=2.0, fill=True)
+            style_axes(ax, make_plot_title(config, label, "Heart Rate"), "Time (s)", "Heart Rate (bpm)")
             ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-            finish_figure(fig, show=True)
+            finish_figure(
+                fig,
+                config=config,
+                module_name="heart_rate",
+                label=label,
+                figure_name="trend",
+                show=show,
+            )
 
         results.append(
             {

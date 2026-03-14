@@ -1,12 +1,10 @@
 """Signal preprocessing helpers."""
 
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import butter, sosfilt
 
-from utils.ui import as_bool, finish_figure, print_kv, print_section, print_subsection, print_success, style_axes
+from utils.ui import add_series, as_bool, finish_figure, make_plot_title, print_kv, print_section, print_subsection, print_success, style_axes
 
 
 def _validate_filter_config(freq, fs, name):
@@ -34,11 +32,12 @@ def _apply_filter(data, btype, freq, fs, order):
 
 def preprocess_dataset(config, dataset, show=None, saveon=None):
     """Filter each 1D segment according to the resolved preprocessing config."""
-    show = as_bool(config["display"].get("preprocess_show", False) if show is None else show)
-    saveon = as_bool(config["display"].get("preprocess_save", False) if saveon is None else saveon)
+    display_config = config.get("display", {})
+    output_config = config.get("output", {})
+    show = as_bool(display_config.get("preprocess_show", False) if show is None else show)
+    saveon = as_bool(output_config.get("save_figures", False) if saveon is None else saveon)
     fs = config["datainfo"]["Fs"]
     segment_labels = config["datainfo"].get("segment_labels", [])
-    result_dir = config["fileinfo"].get("result_dir", "./result")
 
     print_section("PREPROCESS")
     print_subsection("Filter Setup")
@@ -80,10 +79,16 @@ def preprocess_dataset(config, dataset, show=None, saveon=None):
             timeline = np.arange(len(filtered_signal)) / fs
             # TODO: Visualization styling lives here so it can be tuned globally later.
             fig, ax = plt.subplots(figsize=(12, 4.5))
-            ax.plot(timeline, filtered_signal, color="#1f4e79", linewidth=1.6)
-            style_axes(ax, f"{label} Filtered Signal", "Time (s)", "Amplitude")
-            save_path = os.path.join(result_dir, f"{label}_filtered.pdf") if saveon else None
-            finish_figure(fig, save_path=save_path, show=show)
+            add_series(ax, timeline, filtered_signal, color="#1f3c88", linewidth=1.5)
+            style_axes(ax, make_plot_title(config, label, "Filtered Signal"), "Time (s)", "Amplitude")
+            finish_figure(
+                fig,
+                config=config,
+                module_name="preprocess",
+                label=label,
+                figure_name="filtered_signal",
+                show=show,
+            )
 
     print_success("Preprocessing finished.")
     return dataset_filtered

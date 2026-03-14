@@ -21,6 +21,7 @@ Bioprocess is a lightweight offline biosignal analysis pipeline for EEG, ECG, an
 - Structured analysis outputs returned from every module.
 - Consistent terminal reporting and plot styling through shared UI helpers instead of ad hoc formatting.
 - Plotting and result saving controlled through a single configuration object.
+- Figure export goes through one shared output pipeline, so saved plots land in a predictable result tree.
 - Regression tests covering config defaults, dataset loading, analysis dispatch, and ECG peak detection.
 
 ## Project Structure
@@ -128,15 +129,54 @@ Runtime behavior is configured through [nm_config.py](/Users/teddy/Desktop/Biopr
 - `dataset`: loading, slicing, segmentation, and sampling-rate settings
 - `preprocess`: filter toggles and filter orders
 - `analysis`: algorithm parameters
-- `display`: plotting and saving switches
+- `display`: plotting switches
+- `output`: figure export and result-file saving switches
+
+Typical export settings:
+
+```python
+config["output"]["save_figures"] = True
+config["output"]["figure_format"] = "png"
+config["output"]["figure_dpi"] = 320
+```
+
+Saved figures are organized automatically under:
+
+```text
+result/
+└── <MODALITY>/
+    └── <module>/
+```
 
 ## Main Analysis Modules
 
 - `BandAnalysis.py`: EEG band power, relative power, spectral centroid, entropy, concentration, relaxation
 - `Heartrate.py`: ECG R-peak detection, RR intervals, heart rate, SDNN, RMSSD
 - `FFT.py`: whole-segment FFT spectrum
-- `STFT.py`: spectrograms and median-frequency tracking
+- `STFT.py`: spectrograms with energy and calorie estimation
 - `FreqAnalysis.py`: sliding-window RMS, MPF, and MDF, mainly useful for EMG
+  - The returned MDF values stay raw.
+  - The plotted MDF figure adds a light smoothing trend only for visualization.
+
+## Window Choices
+
+The default window settings are chosen to balance temporal detail and stable frequency estimates:
+
+- EEG `BandAnalysis`
+  - Uses about a `1 s` window with `50%` overlap.
+  - This is a practical default for theta/alpha/beta/gamma tracking.
+- ECG `Heartrate`
+  - Does not use a main sliding analysis window.
+  - The core output comes from R-peak detection and RR intervals instead.
+- EMG `FreqAnalysis`
+  - Uses a `1.0 s` window and `0.5 s` step.
+  - This is a stable default for RMS, MPF, and MDF trends.
+- EMG `STFT`
+  - Uses an approximately `0.5 s` window derived from the sampling rate and `50%` overlap.
+  - This keeps the spectrogram responsive to short muscle-activation changes.
+- MDF trend line
+  - The raw MDF result is kept unchanged.
+  - The plotted red trend line is a display-only moving average with a default width of `5 s`.
 
 ## Testing
 

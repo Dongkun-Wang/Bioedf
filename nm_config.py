@@ -65,6 +65,13 @@ def nm_config():
             "filetype": ".csv",
             "result_dir": str(result_dir),
         },
+        "output": {
+            "save_figures": False,
+            "figure_format": "png",
+            "figure_dpi": 320,
+            "organize_by_modality": True,
+            "save_band_metrics_csv": False,
+        },
         "dataset": {
             "source_sampling_rate": 1000,
             "timestamp_column": 0,
@@ -90,24 +97,26 @@ def nm_config():
         "analysis": {
             "enabled_modules": [],
             "fft_type": "log",
+            # STFT uses about a 0.5 s analysis window (power-of-two from Fs) with 50% overlap by default.
+            # This is a good compromise for EMG time-frequency visualization.
             "stft_overlap": 0.5,
-            # Match the original STFT behavior by averaging median frequency over ~20 s windows.
-            "avg_segment_len": 20,
             "band_freq_limit": 60,
+            # FreqAnalysis uses a 1.0 s sliding window with 0.5 s step by default.
+            # This is mainly intended for EMG RMS/MPF/MDF summaries:
+            # stable enough in frequency, while still tracking time variation.
             "rms_time": 1.0,
             "rms_gap": 0.5,
+            # Visualization-only MDF trend smoothing in seconds.
+            # Raw MDF is preserved in the returned results.
+            "mdf_trend_seconds": 5.0,
             "calorie_power_ratio": 25,
         },
         "display": {
             "preprocess_show": True,
-            "preprocess_save": False,
             "heart_rate_show": True,
             "fft_show": True,
-            "fft_save": False,
             "stft_show": True,
-            "median_freq_plot": True,
             "band_show": True,
-            "band_save_csv": False,
             "freq_analysis_show": True,
             "calorie_show": False,
         },
