@@ -48,6 +48,17 @@ Bioprocess/
 
 ## Installation
 
+## Clone The Repository
+
+Clone the project:
+
+
+```bash
+git clone git@github.com:Dongkun-Wang/Bioprocess.git
+```
+
+Then create and activate a virtual environment, and install dependencies:
+
 1. Create and activate a virtual environment.
 2. Install dependencies:
 
