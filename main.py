@@ -9,12 +9,12 @@ from utils.Preprocess import preprocess_dataset
 def main():
     """Run the end-to-end signal analysis pipeline."""
     config = nm_config()
-    config["fileinfo"]["fullpath"] = "./data/右腿"
+    config["fileinfo"]["fullpath"] = "./data/心电"
 
     # Enable these lines when you want to inspect only part of a recording.
     config["dataset"]["slice_enabled"] = True
     config["dataset"]["slice_start"] = "17:17:10"
-    config["dataset"]["slice_end"] = "17:18:50"
+    config["dataset"]["slice_end"] = "17:19:50"
 
     dataset, config = load_dataset(config)
     filtered_dataset = preprocess_dataset(config, dataset)

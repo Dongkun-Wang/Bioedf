@@ -31,6 +31,42 @@ def _smooth_signal(values, fs):
     return np.convolve(values, kernel, mode="same")
 
 
+def _prune_artifact_peaks(peaks, enhanced, fs):
+    """Remove isolated weak peaks that split one normal beat into two short RR intervals."""
+    peaks = np.asarray(peaks, dtype=int)
+    if len(peaks) < 3:
+        return peaks
+
+    enhanced = np.asarray(enhanced, dtype=float)
+    changed = True
+    while changed and len(peaks) >= 3:
+        changed = False
+        rr = np.diff(peaks) / fs
+        if len(rr) < 2:
+            break
+
+        median_rr = float(np.median(rr))
+        short_rr_limit = min(0.55, 0.72 * median_rr)
+
+        for idx in range(1, len(peaks) - 1):
+            prev_rr = (peaks[idx] - peaks[idx - 1]) / fs
+            next_rr = (peaks[idx + 1] - peaks[idx]) / fs
+            combined_rr = prev_rr + next_rr
+            peak_height = float(enhanced[peaks[idx]])
+            neighbor_height = float(np.median([enhanced[peaks[idx - 1]], enhanced[peaks[idx + 1]]]))
+
+            is_isolated_short_rr = min(prev_rr, next_rr) < short_rr_limit
+            looks_like_split_beat = abs(combined_rr - median_rr) <= 0.28 * median_rr
+            is_weaker_peak = peak_height < 0.72 * neighbor_height
+
+            if is_isolated_short_rr and looks_like_split_beat and is_weaker_peak:
+                peaks = np.delete(peaks, idx)
+                changed = True
+                break
+
+    return peaks
+
+
 def _detect_r_peaks(signal, fs):
     """Detect ECG R-peaks using adaptive polarity and two-stage thresholds."""
     normalized = _robust_scale(np.asarray(signal, dtype=float))
@@ -51,7 +87,7 @@ def _detect_r_peaks(signal, fs):
         prominence=max(0.5, 0.3 * spread),
     )
     if len(peaks) > 1:
-        return peaks
+        return _prune_artifact_peaks(peaks, enhanced, fs)
 
     peaks, _ = find_peaks(
         enhanced,
@@ -59,7 +95,7 @@ def _detect_r_peaks(signal, fs):
         height=max(0.3, float(np.percentile(enhanced, 65))),
         prominence=max(0.3, 0.2 * spread),
     )
-    return peaks
+    return _prune_artifact_peaks(peaks, enhanced, fs)
 
 
 def heartrate_analysis(dataset, config):

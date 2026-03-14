@@ -54,70 +54,100 @@ def infer_signal_modality(file_dir, file_names):
     raise ValueError(f"Unable to infer signal modality from directory name: {file_dir}")
 
 
+def _build_fileinfo(result_dir):
+    """Return file and export location defaults."""
+    return {
+        "fullpath": "",
+        "filetype": ".csv",
+        "result_dir": str(result_dir),
+    }
+
+
+def _build_output_config():
+    """Return figure and table export defaults."""
+    return {
+        "save_figures": False,
+        "figure_format": "png",
+        "figure_dpi": 320,
+        "organize_by_modality": True,
+        "save_band_metrics_csv": False,
+    }
+
+
+def _build_dataset_config():
+    """Return dataset loading, slicing, and segmentation defaults."""
+    return {
+        "source_sampling_rate": 1000,
+        "timestamp_column": 0,
+        "signal_column": 2,
+        "sort_files": True,
+        "slice_enabled": False,
+        "slice_start": None,  # Example: "17:17:10" or "2024-06-26 17:17:10"
+        "slice_end": None,  # Example: "17:19:30" or "2024-06-26 17:19:30"
+        "segment_duration_seconds": 60,
+        # Preserve the original device-specific scaling formula.
+        "sampling_rate_scale": 8e6 / 42 / 6 / 32 / 1000,
+    }
+
+
+def _build_preprocess_config():
+    """Return filter defaults that are later completed by modality inference."""
+    return {
+        "bpfilter": True,
+        "bsfilter": True,
+        # Filled automatically after modality inference:
+        # EEG 1-60 Hz, ECG 1-10 Hz, EMG 1-250 Hz.
+        "bpfreq": None,
+        "bsfreq": None,
+        "bpfiltord": 4,
+        "bsfiltord": 4,
+    }
+
+
+def _build_analysis_config():
+    """Return analysis parameter defaults."""
+    return {
+        "enabled_modules": [],
+        "fft_type": "log",
+        # STFT uses about a 0.5 s analysis window (power-of-two from Fs) with 50% overlap by default.
+        # This is a good compromise for EMG time-frequency visualization.
+        "stft_overlap": 0.5,
+        "band_freq_limit": 60,
+        # FreqAnalysis uses a 1.0 s sliding window with 0.5 s step by default.
+        # This is mainly intended for EMG RMS/MPF/MDF summaries:
+        # stable enough in frequency, while still tracking time variation.
+        "rms_time": 1.0,
+        "rms_gap": 0.5,
+        # Visualization-only MDF trend smoothing in seconds.
+        # Raw MDF is preserved in the returned results.
+        "mdf_trend_seconds": 5.0,
+        "calorie_power_ratio": 25,
+    }
+
+
+def _build_display_config():
+    """Return visualization toggle defaults."""
+    return {
+        "preprocess_show": True,
+        "heart_rate_show": True,
+        "fft_show": True,
+        "stft_show": True,
+        "band_show": True,
+        "freq_analysis_show": True,
+        "calorie_show": True,
+    }
+
+
 def nm_config():
     """Build the default runtime configuration."""
     result_dir = Path("./result")
     result_dir.mkdir(exist_ok=True)
 
     return {
-        "fileinfo": {
-            "fullpath": "",
-            "filetype": ".csv",
-            "result_dir": str(result_dir),
-        },
-        "output": {
-            "save_figures": False,
-            "figure_format": "png",
-            "figure_dpi": 320,
-            "organize_by_modality": True,
-            "save_band_metrics_csv": False,
-        },
-        "dataset": {
-            "source_sampling_rate": 1000,
-            "timestamp_column": 0,
-            "signal_column": 2,
-            "sort_files": True,
-            "slice_enabled": False,
-            "slice_start": None,  # Example: "17:17:10" or "2024-06-26 17:17:10"
-            "slice_end": None,  # Example: "17:19:30" or "2024-06-26 17:19:30"
-            "segment_duration_seconds": 60,
-            # Preserve the original device-specific scaling formula.
-            "sampling_rate_scale": 8e6 / 42 / 6 / 32 / 1000,
-        },
-        "preprocess": {
-            "bpfilter": True,
-            "bsfilter": True,
-            # Filled automatically after modality inference:
-            # EEG 1-60 Hz, ECG 1-10 Hz, EMG 1-250 Hz.
-            "bpfreq": None,
-            "bsfreq": None,
-            "bpfiltord": 4,
-            "bsfiltord": 4,
-        },
-        "analysis": {
-            "enabled_modules": [],
-            "fft_type": "log",
-            # STFT uses about a 0.5 s analysis window (power-of-two from Fs) with 50% overlap by default.
-            # This is a good compromise for EMG time-frequency visualization.
-            "stft_overlap": 0.5,
-            "band_freq_limit": 60,
-            # FreqAnalysis uses a 1.0 s sliding window with 0.5 s step by default.
-            # This is mainly intended for EMG RMS/MPF/MDF summaries:
-            # stable enough in frequency, while still tracking time variation.
-            "rms_time": 1.0,
-            "rms_gap": 0.5,
-            # Visualization-only MDF trend smoothing in seconds.
-            # Raw MDF is preserved in the returned results.
-            "mdf_trend_seconds": 5.0,
-            "calorie_power_ratio": 25,
-        },
-        "display": {
-            "preprocess_show": True,
-            "heart_rate_show": True,
-            "fft_show": True,
-            "stft_show": True,
-            "band_show": True,
-            "freq_analysis_show": True,
-            "calorie_show": False,
-        },
+        "fileinfo": _build_fileinfo(result_dir),
+        "output": _build_output_config(),
+        "dataset": _build_dataset_config(),
+        "preprocess": _build_preprocess_config(),
+        "analysis": _build_analysis_config(),
+        "display": _build_display_config(),
     }

@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils.Heartrate import heartrate_analysis
+from utils.Heartrate import _detect_r_peaks, heartrate_analysis
 
 
 def _make_noisy_ecg(fs, duration_seconds, beat_times):
@@ -38,3 +38,21 @@ def test_heartrate_analysis_detects_beats_from_noisy_inverted_ecg():
     heart_rate = result["segments"][0]["heart_rate_bpm"]
     assert len(heart_rate) >= 6
     assert np.isclose(np.median(heart_rate), 60.0, atol=6.0)
+
+
+def test_detect_r_peaks_ignores_weaker_midcycle_artifacts():
+    fs = 250
+    time_axis = np.arange(0, 10, 1 / fs)
+    beat_times = np.arange(1.0, 9.1, 1.0)
+    signal = np.zeros_like(time_axis)
+
+    for beat_time in beat_times:
+        signal += 2.4 * np.exp(-0.5 * ((time_axis - beat_time) / 0.018) ** 2)
+        # Add a weaker broad bump that should not be counted as another R-peak.
+        signal += 0.75 * np.exp(-0.5 * ((time_axis - (beat_time + 0.34)) / 0.05) ** 2)
+
+    peaks = _detect_r_peaks(signal, fs)
+
+    assert len(peaks) == len(beat_times)
+    detected_times = peaks / fs
+    assert np.allclose(detected_times, beat_times, atol=0.05)
