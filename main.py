@@ -1,5 +1,3 @@
-"""Project entry point."""
-
 from nm_config import nm_config
 from utils.Analysis import run_analysis
 from utils.LoadDataset import load_dataset
@@ -9,7 +7,7 @@ from utils.Preprocess import preprocess_dataset
 def main():
     """Run the end-to-end signal analysis pipeline."""
     config = nm_config()
-    config["fileinfo"]["fullpath"] = "./data/心电"
+    config["fileinfo"]["fullpath"] = "./data/右腿"
 
     # Enable these lines when you want to inspect only part of a recording.
     config["dataset"]["slice_enabled"] = True

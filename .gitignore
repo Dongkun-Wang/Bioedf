@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
+.venv/
 .pytest_cache/
 __pycache__/
 *.pyc
@@ -7,3 +8,4 @@ __pycache__/
 data/
 docs/
 result/
+
