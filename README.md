@@ -2,17 +2,6 @@
 
 Bioprocess is a lightweight offline biosignal analysis pipeline for EEG, ECG, and EMG recordings stored as headerless CSV files. It loads raw signals, infers the signal modality automatically, applies modality-specific filtering, runs the appropriate analyses, and optionally visualizes or saves the results.
 
-## Fast Onboarding
-
-If you need to understand the project quickly, read the files in this order:
-
-1. [main.py](/Users/teddy/Desktop/Bioprocess/main.py)
-2. [nm_config.py](/Users/teddy/Desktop/Bioprocess/nm_config.py)
-3. [utils/LoadDataset.py](/Users/teddy/Desktop/Bioprocess/utils/LoadDataset.py)
-4. [utils/Preprocess.py](/Users/teddy/Desktop/Bioprocess/utils/Preprocess.py)
-5. [utils/Analysis.py](/Users/teddy/Desktop/Bioprocess/utils/Analysis.py)
-
-That sequence gives the full runtime flow from input selection to analysis dispatch.
 
 ## What The System Does
 
