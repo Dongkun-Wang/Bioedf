@@ -1,5 +1,3 @@
-"""Project entry point."""
-
 from nm_config import nm_config
 from utils.Analysis import run_analysis
 from utils.LoadDataset import load_dataset
