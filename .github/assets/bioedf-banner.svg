@@ -27,16 +27,6 @@
   </g>
 
   <rect x="84" y="84" width="1112" height="472" rx="28" fill="white" fill-opacity="0.72" stroke="#D9DED6"/>
-
-  <g opacity="0.92">
-    <path d="M185 355C232 298 303 268 379 273C449 278 512 313 561 368" stroke="#1E7C72" stroke-width="10" stroke-linecap="round"/>
-    <path d="M182 391C229 334 300 304 376 309C446 314 510 349 559 404" stroke="#D98A57" stroke-width="10" stroke-linecap="round"/>
-    <path d="M181 427C228 370 299 340 375 345C445 350 508 385 557 440" stroke="#4B9AA6" stroke-width="10" stroke-linecap="round"/>
-    <circle cx="203" cy="355" r="14" fill="#1E7C72"/>
-    <circle cx="203" cy="391" r="14" fill="#D98A57"/>
-    <circle cx="203" cy="427" r="14" fill="#4B9AA6"/>
-  </g>
-
   <g opacity="0.9">
     <rect x="735" y="196" width="328" height="180" rx="20" fill="#FCFBF8" stroke="#D8DDD6"/>
     <rect x="764" y="236" width="270" height="18" rx="9" fill="#D9E8E3"/>
@@ -44,8 +34,8 @@
     <rect x="764" y="312" width="238" height="18" rx="9" fill="#D7E3EF"/>
   </g>
 
-  <text x="176" y="176" fill="#1E7C72" font-family="Arial, Helvetica, sans-serif" font-size="28" letter-spacing="7">EDF BIOSIGNAL ANALYSIS</text>
-  <text x="176" y="248" fill="#1A1A1A" font-family="Arial, Helvetica, sans-serif" font-size="74" font-weight="700">Bioedf</text>
-  <text x="176" y="304" fill="#424242" font-family="Arial, Helvetica, sans-serif" font-size="28">EEG  ECG  EMG processing and visualization for EDF recordings</text>
-  <text x="176" y="486" fill="#5A5A5A" font-family="Arial, Helvetica, sans-serif" font-size="26">Local analysis pipeline  •  Web frontend  •  Multi-modality workflow</text>
+  <text x="176" y="188" fill="#1E7C72" font-family="Arial, Helvetica, sans-serif" font-size="28" letter-spacing="7">EDF BIOSIGNAL ANALYSIS</text>
+  <text x="176" y="270" fill="#1A1A1A" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="700">Bioedf</text>
+  <text x="176" y="334" fill="#424242" font-family="Arial, Helvetica, sans-serif" font-size="29">EEG  ECG  EMG processing and visualization for EDF recordings</text>
+  <text x="176" y="462" fill="#5A5A5A" font-family="Arial, Helvetica, sans-serif" font-size="26">Local analysis pipeline  •  Web frontend  •  Multi-modality workflow</text>
 </svg>
