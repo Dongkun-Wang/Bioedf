@@ -68,16 +68,6 @@ uv sync
 - 心电 ECG：上传 1 个 EDF；如果是多通道，默认分析第 3 通道。
 - 肌电 EMG：上传 1 个 EDF，直接分析可用通道。
 
-### 7. 如果没有 `uv`
-
-```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python -m ensurepip --upgrade
-python -m pip install numpy scipy matplotlib pandas pytest pyedflib
-python frontend_server.py
-```
-
 ## 项目亮点
 
 - 一个项目同时覆盖 EEG、ECG、EMG 三类生理信号。

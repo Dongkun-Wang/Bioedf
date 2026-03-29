@@ -1,41 +1,58 @@
 <svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="64" y1="32" x2="1184" y2="608" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F7F2E8"/>
-      <stop offset="0.45" stop-color="#EEF5F0"/>
-      <stop offset="1" stop-color="#E8F1F5"/>
+    <linearGradient id="bg" x1="96" y1="48" x2="1180" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6F0E6"/>
+      <stop offset="0.5" stop-color="#EFF4EF"/>
+      <stop offset="1" stop-color="#E7EFF5"/>
     </linearGradient>
-    <linearGradient id="accentA" x1="150" y1="90" x2="1160" y2="520" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#D98A57" stop-opacity="0.28"/>
-      <stop offset="1" stop-color="#1E7C72" stop-opacity="0.10"/>
+    <linearGradient id="lineA" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1E7C72"/>
+      <stop offset="1" stop-color="#4B9AA6"/>
     </linearGradient>
-    <linearGradient id="accentB" x1="1000" y1="120" x2="300" y2="540" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4B9AA6" stop-opacity="0.22"/>
-      <stop offset="1" stop-color="#F2C38B" stop-opacity="0.16"/>
+    <linearGradient id="lineB" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#D98A57"/>
+      <stop offset="1" stop-color="#E7B57A"/>
     </linearGradient>
-    <filter id="blurA" x="-40" y="-40" width="1360" height="720" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feGaussianBlur stdDeviation="20"/>
+    <filter id="soft" x="-40" y="-40" width="1360" height="720" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="18"/>
     </filter>
   </defs>
 
   <rect width="1280" height="640" rx="32" fill="url(#bg)"/>
-  <g filter="url(#blurA)">
-    <circle cx="240" cy="144" r="160" fill="url(#accentA)"/>
-    <circle cx="1080" cy="168" r="150" fill="url(#accentB)"/>
-    <circle cx="1060" cy="520" r="180" fill="url(#accentA)"/>
-    <circle cx="180" cy="520" r="140" fill="url(#accentB)"/>
+  <g filter="url(#soft)" opacity="0.45">
+    <ellipse cx="232" cy="146" rx="180" ry="110" fill="#F1C89B"/>
+    <ellipse cx="1080" cy="124" rx="170" ry="120" fill="#BFDAD6"/>
+    <ellipse cx="1024" cy="530" rx="220" ry="120" fill="#D7E4EE"/>
   </g>
 
-  <rect x="84" y="84" width="1112" height="472" rx="28" fill="white" fill-opacity="0.72" stroke="#D9DED6"/>
-  <g opacity="0.9">
-    <rect x="735" y="196" width="328" height="180" rx="20" fill="#FCFBF8" stroke="#D8DDD6"/>
-    <rect x="764" y="236" width="270" height="18" rx="9" fill="#D9E8E3"/>
-    <rect x="764" y="274" width="194" height="18" rx="9" fill="#F0D8C3"/>
-    <rect x="764" y="312" width="238" height="18" rx="9" fill="#D7E3EF"/>
+  <rect x="84" y="84" width="1112" height="472" rx="30" fill="#FFFEFC" fill-opacity="0.78" stroke="#D9DED6"/>
+
+  <rect x="138" y="180" width="14" height="212" rx="7" fill="url(#lineA)"/>
+  <rect x="170" y="180" width="14" height="168" rx="7" fill="url(#lineB)"/>
+  <rect x="202" y="180" width="14" height="128" rx="7" fill="#A7C9D7"/>
+
+  <g opacity="0.96">
+    <rect x="784" y="154" width="266" height="88" rx="22" fill="#F8FBFA" stroke="#D7E4DE"/>
+    <rect x="812" y="183" width="86" height="30" rx="15" fill="#1E7C72" fill-opacity="0.12"/>
+    <text x="829" y="204" fill="#1E7C72" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">EEG</text>
+    <rect x="917" y="185" width="102" height="12" rx="6" fill="#C8DDD9"/>
+    <rect x="917" y="205" width="74" height="12" rx="6" fill="#DCE9E5"/>
+
+    <rect x="744" y="272" width="306" height="88" rx="22" fill="#FBF8F3" stroke="#E6D8C7"/>
+    <rect x="772" y="301" width="86" height="30" rx="15" fill="#D98A57" fill-opacity="0.15"/>
+    <text x="790" y="322" fill="#C16F3D" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">ECG</text>
+    <rect x="877" y="303" width="118" height="12" rx="6" fill="#EAC9B0"/>
+    <rect x="877" y="323" width="86" height="12" rx="6" fill="#F2DAC7"/>
+
+    <rect x="814" y="390" width="236" height="88" rx="22" fill="#F6FAFC" stroke="#D6E3EC"/>
+    <rect x="842" y="419" width="86" height="30" rx="15" fill="#4B9AA6" fill-opacity="0.14"/>
+    <text x="859" y="440" fill="#3D7E89" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">EMG</text>
+    <rect x="947" y="421" width="72" height="12" rx="6" fill="#C5D7E4"/>
+    <rect x="947" y="441" width="52" height="12" rx="6" fill="#D8E5EE"/>
   </g>
 
-  <text x="176" y="188" fill="#1E7C72" font-family="Arial, Helvetica, sans-serif" font-size="28" letter-spacing="7">EDF BIOSIGNAL ANALYSIS</text>
-  <text x="176" y="270" fill="#1A1A1A" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="700">Bioedf</text>
-  <text x="176" y="334" fill="#424242" font-family="Arial, Helvetica, sans-serif" font-size="29">EEG  ECG  EMG processing and visualization for EDF recordings</text>
-  <text x="176" y="462" fill="#5A5A5A" font-family="Arial, Helvetica, sans-serif" font-size="26">Local analysis pipeline  •  Web frontend  •  Multi-modality workflow</text>
+  <text x="256" y="182" fill="#1E7C72" font-family="Arial, Helvetica, sans-serif" font-size="26" letter-spacing="6">LOCAL EDF BIOSIGNAL TOOLKIT</text>
+  <text x="256" y="272" fill="#151515" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="700">Bioedf</text>
+  <text x="256" y="336" fill="#424242" font-family="Arial, Helvetica, sans-serif" font-size="30">Analysis and visualization for EEG, ECG, and EMG recordings</text>
+  <text x="256" y="434" fill="#5A5A5A" font-family="Arial, Helvetica, sans-serif" font-size="26">CLI workflow  •  Local web UI  •  EDF-native channel handling</text>
 </svg>

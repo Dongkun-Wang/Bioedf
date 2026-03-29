@@ -68,16 +68,6 @@ Open:
 - ECG: upload one EDF file; if it contains multiple channels, channel 3 is analyzed by default.
 - EMG: upload one EDF file and analyze the available channel directly.
 
-### 7. If `uv` is not available
-
-```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python -m ensurepip --upgrade
-python -m pip install numpy scipy matplotlib pandas pytest pyedflib
-python frontend_server.py
-```
-
 ## Highlights
 
 - One project for EEG, ECG, and EMG EDF analysis
