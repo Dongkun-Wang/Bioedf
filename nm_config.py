@@ -5,34 +5,33 @@ from pathlib import Path
 
 
 DATASET_DIRECTORY_ALIASES = {
-    # Keep English aliases and legacy Chinese directory names for compatibility.
-    "eeg": ("eeg", "\u8111\u7535"),
-    "ecg": ("ecg", "ekg", "\u5fc3\u7535"),
-    "emg": ("emg", "leg", "arm", "\u53f3\u817f", "\u5de6\u817f", "\u808c\u7535", "\u5de6\u81c2"),
+    "eeg": ("eeg", "脑电"),
+    "ecg": ("ecg", "ekg", "心电"),
+    "emg": ("emg", "leg", "arm", "右腿", "左腿", "肌电", "左臂"),
 }
 
 
 SIGNAL_PROFILES = {
     "eeg": {
         "display_name": "EEG",
-        "keywords": DATASET_DIRECTORY_ALIASES["eeg"],
-        "bandpass": [1, 60],
+        "keywords": DATASET_DIRECTORY_ALIASES["eeg"] + ("f7", "fp1", "fpz", "fp2", "f8"),
+        "bandpass": [0.4, 60],
         "bandstop": [48, 52],
         "channel_strategy": "average_to_single",
         "analysis_modules": ["band"],
     },
     "ecg": {
         "display_name": "ECG",
-        "keywords": DATASET_DIRECTORY_ALIASES["ecg"],
-        "bandpass": [1, 10],
+        "keywords": DATASET_DIRECTORY_ALIASES["ecg"] + ("ra", "la", "v3", "v5"),
+        "bandpass": [5, 25],
         "bandstop": [48, 52],
-        "channel_strategy": "single",
+        "channel_strategy": "ecg_third_or_single",
         "analysis_modules": ["heart_rate"],
     },
     "emg": {
         "display_name": "EMG",
-        "keywords": DATASET_DIRECTORY_ALIASES["emg"] + ("bicep", "tricep"),
-        "bandpass": [1, 250],
+        "keywords": DATASET_DIRECTORY_ALIASES["emg"] + ("bicep", "tricep", "r_bb", "l_bb"),
+        "bandpass": [20, 250],
         "bandstop": [48, 52],
         "channel_strategy": "single",
         "analysis_modules": ["fft", "stft", "freq_analysis"],
@@ -41,7 +40,7 @@ SIGNAL_PROFILES = {
 
 
 def infer_signal_modality(file_dir, file_names):
-    """Infer EEG, ECG, or EMG from directory and file naming patterns."""
+    """Infer EEG, ECG, or EMG from directory and signal naming patterns."""
     text_parts = [file_dir, os.path.basename(file_dir)] + list(file_names)
     searchable = " ".join(part.lower() for part in text_parts if part)
 
@@ -58,7 +57,7 @@ def _build_fileinfo(result_dir):
     """Return file and export location defaults."""
     return {
         "fullpath": "",
-        "filetype": ".csv",
+        "filetype": ".edf",
         "result_dir": str(result_dir),
     }
 
@@ -77,16 +76,15 @@ def _build_output_config():
 def _build_dataset_config():
     """Return dataset loading, slicing, and segmentation defaults."""
     return {
-        "source_sampling_rate": 1000,
-        "timestamp_column": 0,
-        "signal_column": 2,
         "sort_files": True,
+        "recursive_search": True,
+        "preferred_signal_dirs": ["EP", "EPFilter"],
+        "exclude_keywords": ["event"],
         "slice_enabled": False,
-        "slice_start": None,  # Example: "17:17:10" or "2024-06-26 17:17:10"
-        "slice_end": None,  # Example: "17:19:30" or "2024-06-26 17:19:30"
+        "slice_start": None,
+        "slice_end": None,
         "segment_duration_seconds": 60,
-        # Preserve the original device-specific scaling formula.
-        "sampling_rate_scale": 8e6 / 42 / 6 / 32 / 1000,
+        "ecg_channel_index": 3,
     }
 
 
@@ -95,8 +93,6 @@ def _build_preprocess_config():
     return {
         "bpfilter": True,
         "bsfilter": True,
-        # Filled automatically after modality inference:
-        # EEG 1-60 Hz, ECG 1-10 Hz, EMG 1-250 Hz.
         "bpfreq": None,
         "bsfreq": None,
         "bpfiltord": 4,
@@ -109,17 +105,10 @@ def _build_analysis_config():
     return {
         "enabled_modules": [],
         "fft_type": "log",
-        # STFT uses about a 0.5 s analysis window (power-of-two from Fs) with 50% overlap by default.
-        # This is a good compromise for EMG time-frequency visualization.
         "stft_overlap": 0.5,
         "band_freq_limit": 60,
-        # FreqAnalysis uses a 1.0 s sliding window with 0.5 s step by default.
-        # This is mainly intended for EMG RMS/MPF/MDF summaries:
-        # stable enough in frequency, while still tracking time variation.
         "rms_time": 1.0,
         "rms_gap": 0.5,
-        # Visualization-only MDF trend smoothing in seconds.
-        # Raw MDF is preserved in the returned results.
         "mdf_trend_seconds": 5.0,
         "calorie_power_ratio": 25,
     }

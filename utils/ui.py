@@ -39,8 +39,9 @@ plt.rcParams.update(
         "axes.titlecolor": "#16191f",
         "axes.linewidth": 0.9,
         "axes.prop_cycle": cycler(color=LINE_COLORS),
-        "font.family": "DejaVu Serif",
+        "font.family": ["PingFang HK", "Hiragino Sans GB", "Songti SC", "Heiti TC", "Arial Unicode MS", "DejaVu Sans"],
         "font.size": 10.5,
+        "axes.unicode_minus": False,
         "xtick.color": "#30343f",
         "ytick.color": "#30343f",
         "xtick.direction": "out",
@@ -56,6 +57,42 @@ plt.rcParams.update(
         "savefig.pad_inches": 0.08,
     }
 )
+
+
+TRANSLATION_PATTERNS = [
+    (r"\bfrontend run\b", ""),
+    (r"\bR_BB\b|\bR BB\b", "右臂肱二头肌"),
+    (r"\bL_BB\b|\bL BB\b", "左臂肱二头肌"),
+    (r"\beeg_mean\b|\beeg mean\b", "脑电平均通道"),
+    (r"\bRA\b", "右上肢导联"),
+    (r"\bLA\b", "左上肢导联"),
+    (r"\bFpz\b", "额极中线"),
+    (r"\bFp1\b", "左额极"),
+    (r"\bFp2\b", "右额极"),
+    (r"\bF7\b", "左额颞区"),
+    (r"\bF8\b", "右额颞区"),
+    (r"\bV3\b", "V3导联"),
+    (r"\bV5\b", "V5导联"),
+    (r"\bF\b", "F导联"),
+    (r"\bfiltered dataset\b", "分析结果"),
+    (r"\bfiltered signal\b", "滤波后信号"),
+    (r"\bband power\b", "频带功率图"),
+    (r"\bderived indices\b", "专注/放松指标图"),
+    (r"\bfft spectrum\b", "FFT频谱图"),
+    (r"\bspectrogram\b", "时频谱图"),
+    (r"\brms and mdf\b", "RMS与MDF分析图"),
+    (r"\brms mdf\b", "RMS与MDF分析图"),
+    (r"\btrend\b", "趋势图"),
+    (r"\bspectrum\b", "频谱图"),
+    (r"\bindices\b", "指标图"),
+    (r"\bsegment[_ ](\d+)\b", r"第\1段"),
+]
+
+MODALITY_NAME_MAP = {
+    "EEG": "脑电",
+    "ECG": "心电",
+    "EMG": "肌电",
+}
 
 
 def print_section(title):
@@ -134,18 +171,36 @@ def add_series(ax, x, y, *, color, label=None, linewidth=1.8, alpha=0.95, fill=F
 def humanize_text(value):
     """Convert identifiers to reader-friendly labels."""
     text = str(value).replace("_", " ").strip()
-    return re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    for pattern, replacement in TRANSLATION_PATTERNS:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def make_plot_title(config, label, title):
     """Build compact, publication-style figure titles."""
     modality = config.get("datainfo", {}).get("signal_display_name", "Signal")
+    modality = MODALITY_NAME_MAP.get(str(modality).upper(), humanize_text(modality))
+    localized_title = humanize_text(title)
     match = re.search(r"segment_(\d+)", str(label))
     if match:
-        base = f"{modality} Segment {int(match.group(1))}"
+        base = f"{modality}第{int(match.group(1))}段"
     else:
         base = humanize_text(label)
-    return f"{base} {title}".strip()
+    return f"{base} {localized_title}".strip()
+
+
+def make_result_caption(file_stem):
+    """Build a localized frontend caption from an exported figure stem."""
+    return humanize_text(file_stem)
+
+
+def normalize_data_title(value):
+    """Hide internal pipeline markers from saved figure names and captions."""
+    text = str(value or "").strip()
+    if text.lower() in {"frontend_run", "filtered_dataset"}:
+        return None
+    return text or None
 
 
 def _slugify_filename_part(value):
@@ -164,8 +219,9 @@ def build_figure_path(config, module_name, label, *, data_title=None, figure_nam
     root = root / _slugify_filename_part(module_name)
 
     parts = [_slugify_filename_part(label)]
-    if data_title:
-        parts.append(_slugify_filename_part(data_title))
+    normalized_title = normalize_data_title(data_title)
+    if normalized_title:
+        parts.append(_slugify_filename_part(normalized_title))
     if figure_name:
         parts.append(_slugify_filename_part(figure_name))
 

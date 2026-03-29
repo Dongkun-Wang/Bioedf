@@ -1,0 +1,66 @@
+开始时间: 2026-03-27 13:46:02.396 
+被试者：李四，18，MALE， 
+文件格式: edf
+版本信息: v0.13.46
+设备信息: 
+[
+  名称：MH3130C.01.117 
+      地址：C3:07:DF:40:24:C8 
+      别名：MH3130C.01.117 
+      被试者：李四，18，MALE， 
+      采样率：992 
+      采集通道：[3] 
+      采集名称：[3=R_BB-右臂肱二头肌] 
+      未采集通道：[1, 2, 4, 5] 
+      未采集名称：[1=1-1, 2=2-2, 4=4-4, 5=5-5] 
+      增益：1 
+      开始电量：99 
+      模式：0 
+      陀螺仪采样率：52.0 
+      加速度计量程：4 
+      角速度计量程：2000 
+      信息：DeviceInfo{modelNumber='MH3130C.01.1', serialNumber='MH3C02250911220006', manufacturerName='NeuraMatrix Inc.', hardwareRevision='53 TEST HW REV', softwareRevision='53 TEST SW REV', firmwareRevision='0.1.50', isUpdated=true} 
+
+]
+
+滤波方案-开始: 
+[
+  名称：工频滤波50Hz 
+  配置信息：[{"filterName":"Butterworth","filterType":"IIR","high":52.0,"low":48.0,"order":4,"taps":"5","type":"Bandstop","width":"5.0"}] 
+  生效设备：[] 
+  开始时间：2026-03-27 13:46:02.396 
+
+  名称：肌电 
+  配置信息：[{"filterName":"Butterworth","filterType":"IIR","high":250.0,"low":20.0,"order":4,"taps":"5","type":"Bandpass","width":"5.0"}] 
+  生效设备：[{"channelSetting":"1,2,3,4,5","id":"C3:07:DF:40:24:C8"}] 
+  开始时间：2026-03-27 13:46:02.396 
+
+]
+
+滤波方案-结束: 
+[
+  名称：工频滤波50Hz 
+  配置信息：[{"filterName":"Butterworth","filterType":"IIR","high":52.0,"low":48.0,"order":4,"taps":"5","type":"Bandstop","width":"5.0"}] 
+  生效设备：[] 
+  开始时间：2026-03-27 13:46:02.396 
+  结束时间：2026-03-27 13:46:28.156 
+  时长：0时0分25秒 
+
+  名称：肌电 
+  配置信息：[{"filterName":"Butterworth","filterType":"IIR","high":250.0,"low":20.0,"order":4,"taps":"5","type":"Bandpass","width":"5.0"}] 
+  生效设备：[{"channelSetting":"1,2,3,4,5","id":"C3:07:DF:40:24:C8"}] 
+  开始时间：2026-03-27 13:46:02.396 
+  结束时间：2026-03-27 13:46:28.156 
+  时长：0时0分25秒 
+
+]
+
+结束时间: 2026-03-27 13:46:28.156 
+设备信息: 
+[
+  名称：MH3130C.01.117 
+      地址：C3:07:DF:40:24:C8 
+      结束电量：99 
+
+]
+被试者绑定信息: {} 

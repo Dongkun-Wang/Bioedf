@@ -49,15 +49,15 @@ def run_fft(dataset, data_title, config):
             fig, ax = plt.subplots(figsize=(10.5, 4.5))
             if ffttype == "log":
                 plot_y = 10 * np.log10(power + 1e-12)
-                ylabel = "Power (dB)"
+                ylabel = "功率（dB）"
             else:
                 plot_y = power
-                ylabel = "Power"
+                ylabel = "功率"
             high_cut = float(config["preprocess"].get("bpfreq", [0, fs / 2])[1])
             ax.set_xlim(0, min(fs / 2, max(30.0, high_cut * 1.15)))
 
             add_series(ax, frequency, plot_y, color="#0f766e", linewidth=1.7)
-            style_axes(ax, make_plot_title(config, label, "FFT Spectrum"), "Frequency (Hz)", ylabel)
+            style_axes(ax, make_plot_title(config, label, "FFT Spectrum"), "频率（Hz）", ylabel)
             finish_figure(
                 fig,
                 config=config,

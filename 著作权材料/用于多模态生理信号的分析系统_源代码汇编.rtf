@@ -1,0 +1,1625 @@
+{\rtf1\ansi\ansicpg936\deff0{\fonttbl{\f0\fnil\fcharset134 Hiragino Sans GB;}{\f1\fnil\fcharset0 Times New Roman;}{\f2\fmodern\fcharset0 Courier New;}}\viewkind4\uc1
+\pard\qc\sb600\sa240\sl360\slmult1\f0\fs34\b \u29992?\u20110?\u22810?\u27169?\u24577?\u29983?\u29702?\u20449?\u21495?\u30340?\u20998?\u26512?\u31995?\u32479?\par
+\pard\qc\sb0\sa360\sl360\slmult1\f0\fs30\b \u28304?\u20195?\u30721?\u27719?\u32534?\u25991?\u26723?\par
+\pard\qj\sb0\sa160\sl360\slmult1\fi480\f0\fs24 \u20197?\u19979?\u20869?\u23481?\u26681?\u25454?\u24403?\u21069?\u-26503?\u30446?\u28304?\u30721?\u-32278?\u21160?\u25972?\u29702?\u29983?\u25104?\u-244?\u20445?\u30041?\u20027?\u-30335?\u31243?\u24207?\u25991?\u20214?\u21450?\u27979?\u-29739?\u25991?\u20214?\u12290?\par
+\page
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 1. main.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from nm_config import nm_config\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.Analysis import run_analysis\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.LoadDataset import load_dataset\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.Preprocess import preprocess_dataset\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def main():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Run the end-to-end signal analysis pipeline."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config = nm_config()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["fileinfo"]["fullpath"] = "./data/\u21491?\u-32385?"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~# Enable these lines when you want to inspect only part of a recording.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["slice_enabled"] = True\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["slice_start"] = "17:17:10"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["slice_end"] = "17:19:50"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~dataset, config = load_dataset(config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~filtered_dataset = preprocess_dataset(config, dataset)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return run_analysis(filtered_dataset, "filtered_dataset", config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 if __name__ == "__main__":\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~main()\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 2. nm_config.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """Configuration defaults and signal-modality inference helpers."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import os\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from pathlib import Path\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 DATASET_DIRECTORY_ALIASES = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~# Keep English aliases and legacy Chinese directory names for compatibility.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"eeg": ("eeg", "\\u8111\\u7535"),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"ecg": ("ecg", "ekg", "\\u5fc3\\u7535"),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"emg": ("emg", "leg", "arm", "\\u53f3\\u817f", "\\u5de6\\u817f", "\\u808c\\u7535", "\\u5de6\\u81c2"),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 SIGNAL_PROFILES = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"eeg": \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"display_name": "EEG",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"keywords": DATASET_DIRECTORY_ALIASES["eeg"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bandpass": [1, 60],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bandstop": [48, 52],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"channel_strategy": "average_to_single",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"analysis_modules": ["band"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"ecg": \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"display_name": "ECG",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"keywords": DATASET_DIRECTORY_ALIASES["ecg"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bandpass": [1, 10],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bandstop": [48, 52],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"channel_strategy": "single",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"analysis_modules": ["heart_rate"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"emg": \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"display_name": "EMG",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"keywords": DATASET_DIRECTORY_ALIASES["emg"] + ("bicep", "tricep"),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bandpass": [1, 250],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bandstop": [48, 52],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"channel_strategy": "single",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"analysis_modules": ["fft", "stft", "freq_analysis"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def infer_signal_modality(file_dir, file_names):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Infer EEG, ECG, or EMG from directory and file naming patterns."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~text_parts = [file_dir, os.path.basename(file_dir)] + list(file_names)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~searchable = " ".join(part.lower() for part in text_parts if part)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for modality, profile in SIGNAL_PROFILES.items():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if any(keyword.lower() in searchable for keyword in profile["keywords"]):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~return modality, profile\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if len(file_names) >= 4:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return "eeg", SIGNAL_PROFILES["eeg"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~raise ValueError(f"Unable to infer signal modality from directory name: \{file_dir\}")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _build_fileinfo(result_dir):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Return file and export location defaults."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"fullpath": "",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"filetype": ".csv",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"result_dir": str(result_dir),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _build_output_config():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Return figure and table export defaults."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"save_figures": False,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"figure_format": "png",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"figure_dpi": 320,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"organize_by_modality": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"save_band_metrics_csv": False,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _build_dataset_config():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Return dataset loading, slicing, and segmentation defaults."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"source_sampling_rate": 1000,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"timestamp_column": 0,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"signal_column": 2,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"sort_files": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"slice_enabled": False,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"slice_start": None,  # Example: "17:17:10" or "2024-06-26 17:17:10"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"slice_end": None,  # Example: "17:19:30" or "2024-06-26 17:19:30"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"segment_duration_seconds": 60,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# Preserve the original device-specific scaling formula.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"sampling_rate_scale": 8e6 / 42 / 6 / 32 / 1000,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _build_preprocess_config():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Return filter defaults that are later completed by modality inference."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bpfilter": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bsfilter": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# Filled automatically after modality inference:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# EEG 1-60 Hz, ECG 1-10 Hz, EMG 1-250 Hz.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bpfreq": None,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bsfreq": None,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bpfiltord": 4,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"bsfiltord": 4,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _build_analysis_config():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Return analysis parameter defaults."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"enabled_modules": [],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"fft_type": "log",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# STFT uses about a 0.5 s analysis window (power-of-two from Fs) with 50% overlap by default.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# This is a good compromise for EMG time-frequency visualization.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"stft_overlap": 0.5,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"band_freq_limit": 60,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# FreqAnalysis uses a 1.0 s sliding window with 0.5 s step by default.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# This is mainly intended for EMG RMS/MPF/MDF summaries:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# stable enough in frequency, while still tracking time variation.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"rms_time": 1.0,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"rms_gap": 0.5,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# Visualization-only MDF trend smoothing in seconds.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# Raw MDF is preserved in the returned results.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"mdf_trend_seconds": 5.0,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"calorie_power_ratio": 25,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _build_display_config():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Return visualization toggle defaults."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"preprocess_show": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"heart_rate_show": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"fft_show": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"stft_show": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"band_show": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"freq_analysis_show": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"calorie_show": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def nm_config():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Build the default runtime configuration."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~result_dir = Path("./result")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~result_dir.mkdir(exist_ok=True)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"fileinfo": _build_fileinfo(result_dir),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"output": _build_output_config(),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"dataset": _build_dataset_config(),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"preprocess": _build_preprocess_config(),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"analysis": _build_analysis_config(),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"display": _build_display_config(),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 3. pyproject.toml\par
+\pard\ql\li360\sa0\sb0\f2\fs16 [project]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 name = "bioprocess"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 version = "0.1.0"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 description = "Add your description here"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 readme = "README.md"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 requires-python = ">=3.12"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 dependencies = [\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"matplotlib>=3.8",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"numpy>=1.26",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"pandas>=2.2",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"pytest>=8.0",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"scipy>=1.12",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 ]\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 4. utils/Analysis.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """Analysis dispatch helpers."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.BandAnalysis import run_band_analysis\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.FFT import run_fft\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.FreqAnalysis import run_freq_analysis\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.Heartrate import heartrate_analysis\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.STFT import run_stft\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.ui import print_section, print_status, print_success\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 ANALYSIS_HANDLERS = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"heart_rate": ("Running heart-rate analysis.", "heartrate_analysis", False),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"fft": ("Running FFT analysis.", "run_fft", True),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"stft": ("Running STFT analysis.", "run_stft", True),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"band": ("Running band analysis.", "run_band_analysis", True),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"freq_analysis": ("Running frequency-domain summary analysis.", "run_freq_analysis", True),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def run_analysis(dataset, data_title, config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Run the enabled analysis modules and collect their structured outputs."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_section("ANALYSIS")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~results = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"data_title": data_title,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"segment_labels": config["datainfo"].get("segment_labels", []),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"modules": \{\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~enabled_modules = set(config["analysis"].get("enabled_modules", []))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for module_name, (message, handler_name, needs_title) in ANALYSIS_HANDLERS.items():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if module_name not in enabled_modules:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~continue\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~print_status(message)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~handler = globals()[handler_name]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if needs_title:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~results["modules"][module_name] = handler(dataset, data_title, config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~else:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~results["modules"][module_name] = handler(dataset, config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success("Analysis finished.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return results\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 5. utils/BandAnalysis.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """EEG band-power analysis."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import os\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import matplotlib.pyplot as plt\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import pandas as pd\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from scipy.signal import spectrogram\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from scipy.stats import entropy\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.ui import (\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~add_series,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~as_bool,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~finish_figure,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~humanize_text,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~make_plot_title,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_status,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~style_axes,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 )\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def run_band_analysis(dataset, data_title, config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Compute EEG band-power metrics and derived concentration/relaxation indices."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fs = float(config["datainfo"]["Fs"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_labels = config["datainfo"].get("segment_labels", [])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~display_config = config.get("display", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~output_config = config.get("output", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~show = as_bool(display_config.get("band_show", True))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~save_figures = as_bool(output_config.get("save_figures", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~save_csv = as_bool(output_config.get("save_band_metrics_csv", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~result_dir = config["fileinfo"].get("result_dir", "./result")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~freq_limit = float(config["analysis"].get("band_freq_limit", 60))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection("Band Analysis")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_status("Computing EEG band metrics.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~win_len = max(8, int(round(fs)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~noverlap = min(int(win_len * 0.5), win_len - 1)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~freq_bands = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"theta": (4, 7),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"alpha": (8, 13),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"beta_low": (14, 25),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"beta_high": (25, 35),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"gamma": (35, 60),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~band_colors = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"theta": "#1f3c88",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"alpha": "#0f766e",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"beta_low": "#4c956c",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"beta_high": "#c98c1d",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"gamma": "#a63446",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_results = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for idx, signal in enumerate(dataset):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~label = segment_labels[idx] if idx < len(segment_labels) else f"segment_\{idx + 1\}"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal = np.asarray(signal, dtype=float)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~nfft = 2 ** int(np.ceil(np.log2(win_len)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~freqs, times, spectrum = spectrogram(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~signal,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fs=fs,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~window="hann",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~nperseg=win_len,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~noverlap=noverlap,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~nfft=nfft,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~keep = freqs <= freq_limit\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~freqs = freqs[keep]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~spectrum = spectrum[keep, :]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~total_power = np.sum(spectrum, axis=0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~total_power = np.where(total_power == 0, 1e-12, total_power)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~metrics = pd.DataFrame(index=times)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~render_power = show or save_figures\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~render_indices = show or save_figures\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if render_power:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~# TODO: Visualization styling lives here so it can be tuned globally later.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fig_power, ax_power = plt.subplots(figsize=(12, 4.5))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~for band_name, band_range in freq_bands.items():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~band_idx = np.where((freqs >= band_range[0]) & (freqs < band_range[1]))[0]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~if len(band_idx) == 0:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~band_power = np.zeros_like(times)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~else:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~band_power = np.mean(spectrum[band_idx, :], axis=0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~metrics[band_name] = band_power\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~metrics[f"\{band_name\}_rel"] = band_power / total_power\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~if render_power:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~add_series(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~ax_power,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~times,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~band_power,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~color=band_colors[band_name],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label=f"\{humanize_text(band_name).title()\} \{band_range[0]\}-\{band_range[1]\} Hz",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~linewidth=1.6,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# Derived metrics summarize where the spectrum is centered and how spread it is.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~spectrum_sum = np.sum(spectrum, axis=0) + 1e-12\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~spectral_centroid = np.sum(freqs[:, None] * spectrum, axis=0) / spectrum_sum\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~psd_norm = spectrum / spectrum_sum\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~spectral_entropy = entropy(psd_norm, axis=0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~metrics["spectral_centroid"] = spectral_centroid\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~metrics["spectral_entropy"] = spectral_entropy\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~metrics["concentration"] = (metrics["beta_low"] + metrics["beta_high"]) / (\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~metrics["alpha"] + metrics["theta"] + 1e-12\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~metrics["relaxation"] = metrics["alpha"] / (\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~metrics["alpha"] + metrics["beta_low"] + metrics["beta_high"] + metrics["theta"] + 1e-12\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if save_csv:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~os.makedirs(result_dir, exist_ok=True)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~metrics.to_csv(os.path.join(result_dir, f"\{label\}_\{data_title\}_band_metrics.csv"))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if render_power:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_axes(ax_power, make_plot_title(config, label, "Band Power"), "Time (s)", "Power")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~ax_power.set_ylim(bottom=0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~ax_power.legend(frameon=False, ncol=2)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~finish_figure(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fig_power,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config=config,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~module_name="band",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label=label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~data_title=data_title,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~figure_name="band_power",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~show=show,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if render_indices:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~# TODO: Visualization styling lives here so it can be tuned globally later.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fig_index, ax_index = plt.subplots(figsize=(12, 4.5))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~add_series(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~ax_index,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~metrics.index,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~metrics["concentration"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label="Concentration",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~color="#1f3c88",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~linewidth=1.9,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~add_series(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~ax_index,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~metrics.index,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~metrics["relaxation"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label="Relaxation",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~color="#4c956c",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~linewidth=1.9,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_axes(ax_index, make_plot_title(config, label, "Derived Indices"), "Time (s)", "Index")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~ax_index.set_ylim(bottom=0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~ax_index.legend(frameon=False)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~finish_figure(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fig_index,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config=config,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~module_name="band",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label=label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~data_title=data_title,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~figure_name="indices",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~show=show,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~segment_results.append(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"label": label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"frequency_hz": freqs,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"time_s": times,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"spectrum": spectrum,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"metrics": metrics,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success("Band analysis finished.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{"segments": segment_results\}\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 6. utils/FFT.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """FFT-based spectrum analysis."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import matplotlib.pyplot as plt\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.ui import add_series, as_bool, finish_figure, make_plot_title, print_status, print_subsection, print_success, style_axes\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def run_fft(dataset, data_title, config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Run FFT for every segment and optionally plot or save the spectrum."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fs = float(config["datainfo"]["Fs"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~display_config = config.get("display", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~output_config = config.get("output", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fftshow = as_bool(display_config.get("fft_show", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ffttype = config["analysis"].get("fft_type", "log")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fftsave = as_bool(output_config.get("save_figures", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_labels = config["datainfo"].get("segment_labels", [])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection("FFT")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_status("Computing spectra.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fft_results = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for idx, signal in enumerate(dataset):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal = np.asarray(signal, dtype=float)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~n_len = len(signal)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~ns = 2 ** int(np.floor(np.log2(n_len)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if ns == 0:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~continue\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# Use the largest power-of-two window from the tail for stable FFT sizing.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~windowed_signal = signal[-ns:] * np.hanning(ns)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~windowed_fft = np.fft.rfft(windowed_signal)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~magnitude = np.abs(windowed_fft) / ns\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~power = magnitude**2\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~frequency = np.fft.rfftfreq(ns, d=1.0 / fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~label = segment_labels[idx] if idx < len(segment_labels) else f"segment_\{idx + 1\}"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~fft_results.append(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"label": label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"frequency_hz": frequency,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"magnitude": magnitude,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"power": power,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if fftshow or fftsave:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~# TODO: Visualization styling lives here so it can be tuned globally later.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fig, ax = plt.subplots(figsize=(10.5, 4.5))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~if ffttype == "log":\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~plot_y = 10 * np.log10(power + 1e-12)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~ylabel = "Power (dB)"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~else:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~plot_y = power\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~ylabel = "Power"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~high_cut = float(config["preprocess"].get("bpfreq", [0, fs / 2])[1])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~ax.set_xlim(0, min(fs / 2, max(30.0, high_cut * 1.15)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~add_series(ax, frequency, plot_y, color="#0f766e", linewidth=1.7)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_axes(ax, make_plot_title(config, label, "FFT Spectrum"), "Frequency (Hz)", ylabel)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~finish_figure(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fig,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config=config,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~module_name="fft",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label=label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~data_title=data_title,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~figure_name="spectrum",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~show=fftshow,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success("FFT finished.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{"segments": fft_results\}\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 7. utils/FreqAnalysis.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """Sliding-window frequency summary metrics."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import matplotlib.pyplot as plt\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from scipy.fft import fft\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from scipy.signal.windows import hann\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.ui import add_series, as_bool, finish_figure, make_plot_title, print_status, print_subsection, print_success, style_axes\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _moving_average(values, window_size):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Return a centered moving average for visualization-only trend overlays."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if window_size <= 1 or len(values) < window_size:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return np.asarray(values, dtype=float)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~padded = np.pad(values, (window_size // 2, window_size - 1 - window_size // 2), mode="edge")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~kernel = np.ones(window_size, dtype=float) / window_size\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return np.convolve(padded, kernel, mode="valid")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def run_freq_analysis(dataset, data_title, config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Compute sliding-window RMS, MPF, and MDF while plotting only RMS and MDF."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fs = float(config["datainfo"]["Fs"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~seq_len = max(1, int(fs * float(config["analysis"].get("rms_time", 1.0))))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~seq_gap = max(1, int(fs * float(config["analysis"].get("rms_gap", 0.5))))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~display_config = config.get("display", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~output_config = config.get("output", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~show = as_bool(display_config.get("freq_analysis_show", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~save_figures = as_bool(output_config.get("save_figures", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_labels = config["datainfo"].get("segment_labels", [])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~trend_seconds = max(0.0, float(config["analysis"].get("mdf_trend_seconds", 5.0)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection("Frequency Summary")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_status("Computing sliding-window EMG summary metrics (RMS, MPF, MDF).")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~results = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for idx, signal in enumerate(dataset):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~label = segment_labels[idx] if idx < len(segment_labels) else f"segment_\{idx + 1\}"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal = np.asarray(signal, dtype=float)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if len(signal) < seq_len:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~results.append(\{"label": label, "rms": [], "mpf_hz": [], "mdf_hz": [], "time_s": []\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~continue\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~window = hann(seq_len)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~freqs = np.arange(0, seq_len // 2) * fs / seq_len\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~mpf = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~mdf = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~rms = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~time_s = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~for start in range(0, len(signal) - seq_len + 1, seq_gap):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~segment = signal[start : start + seq_len]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~power = np.abs(fft(segment * window) / seq_len)[: len(freqs)] ** 2\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~power_sum = np.sum(power)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~if power_sum == 0:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~power_sum = 1e-12\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~mpf.append(float(np.sum(freqs * power) / power_sum))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~cumulative_power = np.cumsum(power)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~mdf.append(float(freqs[np.argmin(np.abs(cumulative_power - 0.5 * cumulative_power[-1]))]))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~rms.append(float(np.sqrt(np.mean(np.abs(segment) ** 2))))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~time_s.append(start / fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~step_seconds = seq_gap / fs if fs else 0.0\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~trend_window = max(1, int(round(trend_seconds / step_seconds))) if step_seconds > 0 else 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~mdf_trend = _moving_average(np.asarray(mdf, dtype=float), trend_window)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if show or save_figures:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~# TODO: Visualization styling lives here so it can be tuned globally later.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fig, (ax_rms, ax_mdf) = plt.subplots(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~2,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~1,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~figsize=(10.5, 7.2),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~sharex=True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~constrained_layout=True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~gridspec_kw=\{"hspace": 0.18\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fig.suptitle(make_plot_title(config, label, "RMS and MDF"), fontsize=13.0, fontweight="semibold")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~add_series(ax_rms, time_s, rms, color="#6c5b7b", linewidth=1.9, fill=True)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_axes(ax_rms, "RMS", "", "RMS")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~add_series(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~ax_mdf,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~time_s,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~mdf,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~color="#a8a4b8",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~linewidth=1.1,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~alpha=0.85,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label="Raw MDF",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~add_series(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~ax_mdf,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~time_s,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~mdf_trend,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~color="#c8553d",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~linewidth=2.2,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label="Trend MDF",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_axes(ax_mdf, "MDF", "Time (s)", "Frequency (Hz)")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~ax_mdf.legend(loc="upper right", frameon=False)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~finish_figure(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fig,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config=config,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~module_name="freq_analysis",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label=label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~data_title=data_title,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~figure_name="rms_mdf",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~show=show,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~layout="none",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~results.append(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"label": label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"rms": rms,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"mpf_hz": mpf,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"mdf_hz": mdf,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"mdf_trend_hz": mdf_trend.tolist(),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"time_s": time_s,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success("Frequency summary finished.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{"segments": results\}\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 8. utils/Heartrate.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """Heart-rate and HRV analysis helpers."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import matplotlib.pyplot as plt\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import matplotlib.ticker as ticker\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from scipy.signal import find_peaks\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.ui import add_series, as_bool, finish_figure, make_plot_title, print_kv, print_status, print_subsection, print_success, style_axes\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _robust_scale(values):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Scale a signal using MAD first and standard deviation as fallback."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~centered = values - np.median(values)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~mad = np.median(np.abs(centered))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if mad > 1e-9:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return centered / (1.4826 * mad)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~std = np.std(centered)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if std > 1e-9:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return centered / std\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return centered\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _smooth_signal(values, fs):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Apply a short moving average to reduce isolated spikes before peak picking."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~window = max(1, int(round(fs * 0.08)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if window <= 1:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return values\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~kernel = np.ones(window, dtype=float) / window\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return np.convolve(values, kernel, mode="same")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _prune_artifact_peaks(peaks, enhanced, fs):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Remove isolated weak peaks that split one normal beat into two short RR intervals."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~peaks = np.asarray(peaks, dtype=int)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if len(peaks) < 3:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return peaks\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~enhanced = np.asarray(enhanced, dtype=float)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~changed = True\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~while changed and len(peaks) >= 3:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~changed = False\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~rr = np.diff(peaks) / fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if len(rr) < 2:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~break\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~median_rr = float(np.median(rr))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~short_rr_limit = min(0.55, 0.72 * median_rr)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~for idx in range(1, len(peaks) - 1):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~prev_rr = (peaks[idx] - peaks[idx - 1]) / fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~next_rr = (peaks[idx + 1] - peaks[idx]) / fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~combined_rr = prev_rr + next_rr\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~peak_height = float(enhanced[peaks[idx]])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~neighbor_height = float(np.median([enhanced[peaks[idx - 1]], enhanced[peaks[idx + 1]]]))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~is_isolated_short_rr = min(prev_rr, next_rr) < short_rr_limit\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~looks_like_split_beat = abs(combined_rr - median_rr) <= 0.28 * median_rr\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~is_weaker_peak = peak_height < 0.72 * neighbor_height\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~if is_isolated_short_rr and looks_like_split_beat and is_weaker_peak:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~peaks = np.delete(peaks, idx)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~changed = True\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~break\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return peaks\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _detect_r_peaks(signal, fs):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Detect ECG R-peaks using adaptive polarity and two-stage thresholds."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~normalized = _robust_scale(np.asarray(signal, dtype=float))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~positive_tail = np.percentile(normalized, 95)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~negative_tail = abs(np.percentile(normalized, 5))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if negative_tail > positive_tail:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~normalized = -normalized\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~enhanced = _smooth_signal(normalized, fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~min_distance = max(1, int(round(fs * 0.35)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~spread = max(np.std(enhanced), 1e-6)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~peaks, _ = find_peaks(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~enhanced,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~distance=min_distance,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~height=max(0.6, float(np.percentile(enhanced, 75))),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~prominence=max(0.5, 0.3 * spread),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if len(peaks) > 1:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return _prune_artifact_peaks(peaks, enhanced, fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~peaks, _ = find_peaks(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~enhanced,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~distance=min_distance,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~height=max(0.3, float(np.percentile(enhanced, 65))),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~prominence=max(0.3, 0.2 * spread),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return _prune_artifact_peaks(peaks, enhanced, fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def heartrate_analysis(dataset, config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Compute RR intervals, heart rate, and HRV metrics for each ECG segment."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fs = float(config["datainfo"]["Fs"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~display_config = config.get("display", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~output_config = config.get("output", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~show = as_bool(display_config.get("heart_rate_show", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~save_figures = as_bool(output_config.get("save_figures", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_labels = config["datainfo"].get("segment_labels", [])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection("Heart Rate")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_status("Detecting R-peaks and computing HRV metrics.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~results = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for idx, arr in enumerate(dataset):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~label = segment_labels[idx] if idx < len(segment_labels) else f"segment_\{idx + 1\}"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~peaks = _detect_r_peaks(arr, fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if len(peaks) <= 1:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~print_status(f"\{label\}: not enough R-peaks detected.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~results.append(\{"label": label, "detected": False\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~continue\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~rr_intervals = np.diff(peaks) / fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~rr_ms = rr_intervals * 1000\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~heart_rate = 60 / rr_intervals\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~time_hr = peaks[1:] / fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~sdnn = float(np.std(rr_ms))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~rmssd = float(np.sqrt(np.mean(np.diff(rr_ms) ** 2))) if len(rr_ms) > 1 else 0.0\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~print_kv(f"\{label\} SDNN", f"\{sdnn:.2f\} ms")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~print_kv(f"\{label\} RMSSD", f"\{rmssd:.2f\} ms")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if show or save_figures:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~# TODO: Visualization styling lives here so it can be tuned globally later.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fig, ax = plt.subplots(figsize=(10.5, 4.5))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~add_series(ax, time_hr, heart_rate, color="#a63446", linewidth=2.0, fill=True)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_axes(ax, make_plot_title(config, label, "Heart Rate"), "Time (s)", "Heart Rate (bpm)")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~finish_figure(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fig,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config=config,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~module_name="heart_rate",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label=label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~figure_name="trend",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~show=show,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~results.append(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"label": label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"detected": True,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"rr_intervals_ms": rr_ms,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"sdnn_ms": sdnn,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"rmssd_ms": rmssd,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"heart_rate_bpm": heart_rate,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"time_s": time_hr,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success("Heart-rate analysis finished.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{"segments": results\}\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 9. utils/LoadDataset.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """Dataset loading and normalization helpers."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import os\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from datetime import datetime, time\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import pandas as pd\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from nm_config import infer_signal_modality\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.ui import print_kv, print_section, print_status, print_subsection, print_success\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _format_datetime(value):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Format datetimes with millisecond precision for console output."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return value.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _parse_slice_boundary(value):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Parse either a time-only boundary or a full datetime boundary."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if value in (None, ""):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return None\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if isinstance(value, time):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return ("time", value)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if isinstance(value, datetime):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return ("datetime", value)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~text = str(value).strip()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~try:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return ("datetime", datetime.fromisoformat(text))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~except ValueError:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return ("time", time.fromisoformat(text))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _build_time_mask(datetime_objects, slice_start, slice_end):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Build a boolean mask for the requested time window."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if slice_start is None and slice_end is None:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return np.ones(len(datetime_objects), dtype=bool)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~start_kind = _parse_slice_boundary(slice_start)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~end_kind = _parse_slice_boundary(slice_end)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if start_kind is None or end_kind is None:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raise ValueError("When slice_enabled is True, both slice_start and slice_end must be set.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if start_kind[0] != end_kind[0]:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raise ValueError("slice_start and slice_end must use the same time format.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if start_kind[0] == "datetime":\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~start_value, end_value = start_kind[1], end_kind[1]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return np.array([start_value <= dt <= end_value for dt in datetime_objects], dtype=bool)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~start_value, end_value = start_kind[1], end_kind[1]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return np.array([start_value <= dt.time() <= end_value for dt in datetime_objects], dtype=bool)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _resolve_sampling_rate(config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Resolve the final sampling rate using the original project scaling formula."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~raw_fs = float(config["dataset"].get("source_sampling_rate", 1000))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~scale = float(config["dataset"].get("sampling_rate_scale", 1.0))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return max(1, round(raw_fs * scale))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _segment_signal(signal, fs, segment_seconds):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Split one 1D signal into equally sized analysis segments."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if not segment_seconds or segment_seconds <= 0:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return [signal]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~max_length = max(1, int(round(fs * segment_seconds)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if len(signal) <= max_length:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return [signal]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_count = int(np.ceil(len(signal) / max_length))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return [segment for segment in np.array_split(signal, segment_count) if len(segment) > 0]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _apply_channel_strategy(signals, channel_names, config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Apply the modality-specific channel handling policy."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~strategy = config["datainfo"].get("channel_strategy", "single")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if strategy == "average_to_single":\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~averaged_signal = np.mean(np.vstack(signals), axis=0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~averaged_name = f"\{config['datainfo']['signal_type']\}_mean"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return [averaged_signal], [averaged_name]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return signals, channel_names\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def load_dataset(config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Load headerless CSV recordings and normalize them into 1D segments."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config.setdefault("datainfo", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~file_dir = config["fileinfo"]["fullpath"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~file_type = config["fileinfo"]["filetype"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if not os.path.isdir(file_dir):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raise FileNotFoundError(f"Data directory does not exist: \{file_dir\}")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~file_list = [file_name for file_name in os.listdir(file_dir) if file_name.endswith(file_type)]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if config["dataset"].get("sort_files", True):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~file_list.sort()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if not file_list:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raise FileNotFoundError(f"No \{file_type\} files were found in \{file_dir\}.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~timestamp_column = int(config["dataset"].get("timestamp_column", 0))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~signal_column = int(config["dataset"].get("signal_column", 2))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~raw_signals = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~raw_timestamps = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~channel_names = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for file_name in file_list:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~full_path = os.path.join(file_dir, file_name)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~frame = pd.read_csv(full_path, header=None)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if frame.shape[1] <= max(timestamp_column, signal_column):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~raise ValueError(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~f"\{file_name\} is missing an expected column. Only \{frame.shape[1]\} columns were found."\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raw_timestamps.append(frame.iloc[:, timestamp_column].to_numpy(dtype=np.int64))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raw_signals.append(frame.iloc[:, signal_column].to_numpy(dtype=float))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~channel_names.append(os.path.splitext(file_name)[0])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~modality, profile = infer_signal_modality(file_dir, channel_names)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["signal_type"] = modality\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["signal_display_name"] = profile["display_name"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["channel_strategy"] = profile["channel_strategy"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["analysis"]["enabled_modules"] = list(profile["analysis_modules"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["preprocess"]["bpfreq"] = list(profile["bandpass"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["preprocess"]["bsfreq"] = list(profile["bandstop"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~# Truncate every channel to the shortest one to preserve alignment before averaging.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~min_len = min(len(signal) for signal in raw_signals)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~raw_signals = [signal[:min_len] for signal in raw_signals]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~raw_timestamps = [timestamps[:min_len] for timestamps in raw_timestamps]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~reference_timestamps = raw_timestamps[0]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~datetime_objects = np.array(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~[datetime.fromtimestamp(timestamp / 1000.0) for timestamp in reference_timestamps],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~dtype=object,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~experiment_start = datetime_objects[0]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~experiment_end = datetime_objects[-1]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_section("LOAD DATASET")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection("Experiment Window")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Start time", _format_datetime(experiment_start))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("End time", _format_datetime(experiment_end))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Duration", experiment_end - experiment_start)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if config["dataset"].get("slice_enabled", False):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~time_mask = _build_time_mask(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~datetime_objects,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~config["dataset"].get("slice_start"),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~config["dataset"].get("slice_end"),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if not np.any(time_mask):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~raise ValueError("The selected slice window did not match any samples.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raw_signals = [signal[time_mask] for signal in raw_signals]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~datetime_objects = datetime_objects[time_mask]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~reference_timestamps = reference_timestamps[time_mask]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~print_subsection("Slice Window")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~print_kv("Slice start", _format_datetime(datetime_objects[0]))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~print_kv("Slice end", _format_datetime(datetime_objects[-1]))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~print_kv("Slice samples", len(datetime_objects))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~processed_channels, processed_names = _apply_channel_strategy(raw_signals, channel_names, config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~resolved_fs = _resolve_sampling_rate(config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_seconds = config["dataset"].get("segment_duration_seconds", 60)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~dataset = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_labels = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for channel_name, signal in zip(processed_names, processed_channels):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~for segment_idx, segment in enumerate(_segment_signal(signal, resolved_fs, segment_seconds), start=1):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~dataset.append(np.asarray(segment, dtype=float))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~segment_labels.append(f"\{channel_name\}_segment_\{segment_idx\}")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["Fs"] = resolved_fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["chcnt"] = len(processed_channels)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["chname"] = processed_names\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["source_channels"] = channel_names\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["segment_count"] = len(dataset)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["segment_labels"] = segment_labels\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["datainfo"]["time_range"] = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"experiment_start": _format_datetime(experiment_start),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"experiment_end": _format_datetime(experiment_end),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"slice_start": _format_datetime(datetime_objects[0]),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"slice_end": _format_datetime(datetime_objects[-1]),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"sample_count": len(datetime_objects),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"timestamps_ms": \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~"start": int(reference_timestamps[0]),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~"end": int(reference_timestamps[-1]),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection("Resolved Profile")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Signal modality", f"\{config['datainfo']['signal_display_name']\} (\{modality\})")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Source channels", ", ".join(channel_names))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Analysis channels", ", ".join(processed_names))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Band-pass", config["preprocess"]["bpfreq"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Sampling rate", f"\{config['datainfo']['Fs']:.4f\} Hz")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Segment count", len(dataset))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_kv("Segment labels", ", ".join(segment_labels))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_status("Dataset loading finished.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return dataset, config\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 10. utils/Preprocess.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """Signal preprocessing helpers."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import matplotlib.pyplot as plt\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from scipy.signal import butter, sosfilt\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.ui import add_series, as_bool, finish_figure, make_plot_title, print_kv, print_section, print_subsection, print_success, style_axes\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _validate_filter_config(freq, fs, name):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Validate the configured cutoff range for a digital filter."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if freq is None:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raise ValueError(f"\{name\} frequency is not set. Load data and infer the signal profile first.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if not isinstance(freq, (list, tuple)) or len(freq) != 2:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raise ValueError(f"\{name\} frequency must be a two-element list or tuple.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~low, high = float(freq[0]), float(freq[1])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~nyquist = 0.5 * float(fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if low <= 0 or high <= 0 or low >= high:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raise ValueError(f"Invalid \{name\} frequency range: \{freq\}")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if high >= nyquist:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~raise ValueError(f"\{name\} high cutoff must be lower than the Nyquist frequency \{nyquist:.4f\} Hz.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _apply_filter(data, btype, freq, fs, order):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Apply a Butterworth filter in second-order sections form."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~_validate_filter_config(freq, fs, btype)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~normal_freq = np.asarray(freq, dtype=float) / (0.5 * float(fs))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~sos = butter(int(order), normal_freq, btype=btype, output="sos")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return sosfilt(sos, data)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def preprocess_dataset(config, dataset, show=None, saveon=None):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Filter each 1D segment according to the resolved preprocessing config."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~display_config = config.get("display", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~output_config = config.get("output", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~show = as_bool(display_config.get("preprocess_show", False) if show is None else show)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~saveon = as_bool(output_config.get("save_figures", False) if saveon is None else saveon)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fs = config["datainfo"]["Fs"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_labels = config["datainfo"].get("segment_labels", [])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_section("PREPROCESS")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection("Filter Setup")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~filters = [\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~("bpfilter", "bp", "Band-pass"),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~("bsfilter", "bs", "Band-stop"),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for filter_field, filter_prefix, filter_name in filters:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if as_bool(config["preprocess"].get(filter_field, False)):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~filter_freq = config["preprocess"].get(f"\{filter_prefix\}freq")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~filter_order = config["preprocess"].get(f"\{filter_prefix\}filtord", 4)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~print_kv(f"\{filter_name\} range", filter_freq)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~print_kv(f"\{filter_name\} order", filter_order)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~dataset_filtered = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for idx, signal in enumerate(dataset):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~filtered_signal = np.asarray(signal, dtype=float)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if as_bool(config["preprocess"].get("bpfilter", False)):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~filtered_signal = _apply_filter(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~filtered_signal,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"bandpass",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config["preprocess"]["bpfreq"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fs,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config["preprocess"].get("bpfiltord", 4),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if as_bool(config["preprocess"].get("bsfilter", False)):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~filtered_signal = _apply_filter(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~filtered_signal,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"bandstop",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config["preprocess"]["bsfreq"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fs,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config["preprocess"].get("bsfiltord", 4),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~dataset_filtered.append(filtered_signal)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if show or saveon:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~label = segment_labels[idx] if idx < len(segment_labels) else f"segment_\{idx + 1\}"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~timeline = np.arange(len(filtered_signal)) / fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~# TODO: Visualization styling lives here so it can be tuned globally later.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fig, ax = plt.subplots(figsize=(12, 4.5))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~add_series(ax, timeline, filtered_signal, color="#1f3c88", linewidth=1.5)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_axes(ax, make_plot_title(config, label, "Filtered Signal"), "Time (s)", "Amplitude")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~finish_figure(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fig,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config=config,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~module_name="preprocess",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label=label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~figure_name="filtered_signal",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~show=show,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success("Preprocessing finished.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return dataset_filtered\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 11. utils/STFT.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """Short-time Fourier transform analysis."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import matplotlib.pyplot as plt\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from scipy.signal import spectrogram\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.ui import as_bool, finish_figure, make_plot_title, print_status, print_subsection, print_success, style_colorbar, style_heatmap\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def run_stft(dataset, data_title, config):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Perform STFT spectrogram analysis and mandatory energy estimation."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fs = float(config["datainfo"]["Fs"])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~segment_labels = config["datainfo"].get("segment_labels", [])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~display_config = config.get("display", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~output_config = config.get("output", \{\})\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~stft_show = as_bool(display_config.get("stft_show", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~save_figures = as_bool(output_config.get("save_figures", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~stft_overlap = float(config["analysis"].get("stft_overlap", 0.5))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~calorie_show = as_bool(display_config.get("calorie_show", False))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~calorie_power_ratio = float(config["analysis"].get("calorie_power_ratio", 25))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_subsection("STFT")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_status("Computing spectrograms and energy estimates.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~win_len = max(8, 2 ** int(np.floor(np.log2(fs))))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~noverlap = min(int(win_len * stft_overlap), win_len - 1)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~results = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for idx, signal in enumerate(dataset):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~label = segment_labels[idx] if idx < len(segment_labels) else f"segment_\{idx + 1\}"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal = np.asarray(signal, dtype=float)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~freqs, times, spectrum = spectrogram(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~signal,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fs=fs,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~window="hann",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~nperseg=win_len,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~noverlap=noverlap,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~nfft=win_len,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~valid_idx = freqs <= 250\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~freqs = freqs[valid_idx]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~spectrum = spectrum[valid_idx, :]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~rms = float(np.sqrt(np.mean(signal**2)))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~duration = len(signal) / fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~power_est = rms * calorie_power_ratio\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~kcal_est = (power_est * duration) / 4184\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if calorie_show:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~print_status(f"\{label\}: RMS=\{rms:.4f\}, estimated power=\{power_est:.2f\} W, calories~\{kcal_est:.4f\} kcal")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if stft_show or save_figures:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~# TODO: Visualization styling lives here so it can be tuned globally later.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~fig_spec, ax_spec = plt.subplots(figsize=(10.8, 4.8), constrained_layout=True)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~log_spectrum = 10 * np.log10(spectrum + 1e-12)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~vmin, vmax = np.percentile(log_spectrum, [5, 99.5])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~image = ax_spec.pcolormesh(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~times,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~freqs,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~log_spectrum,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~shading="auto",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~cmap="magma",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~vmin=vmin,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~vmax=vmax,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~colorbar = fig_spec.colorbar(image, ax=ax_spec, pad=0.02, aspect=28)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_colorbar(colorbar, "Power/Frequency (dB/Hz)")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~style_heatmap(ax_spec, make_plot_title(config, label, "Spectrogram"), "Time (s)", "Frequency (Hz)")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~finish_figure(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~fig_spec,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~config=config,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~module_name="stft",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~label=label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~data_title=data_title,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~figure_name="spectrogram",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~show=stft_show,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~layout="none",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~results.append(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"label": label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"frequency_hz": freqs,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"time_s": times,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"spectrum": spectrum,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"power_estimate_w": power_est,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~"calorie_estimate_kcal": kcal_est,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print_success("STFT finished.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return \{"segments": results\}\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 12. utils/__init__.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 # Utility package for signal ingestion, preprocessing, and analysis.\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 13. utils/ui.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 """Shared helpers for terminal output and Matplotlib styling."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import os\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import re\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from pathlib import Path\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import matplotlib.pyplot as plt\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from cycler import cycler\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 LINE_WIDTH = 80\par
+\pard\ql\li360\sa0\sb0\f2\fs16 PAPER_COLORS = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"blue": "#1f3c88",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"teal": "#0f766e",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"green": "#4c956c",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"gold": "#c98c1d",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"orange": "#c8553d",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"red": "#a63446",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"purple": "#6c5b7b",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"charcoal": "#243447",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 LINE_COLORS = [\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~PAPER_COLORS["blue"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~PAPER_COLORS["teal"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~PAPER_COLORS["green"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~PAPER_COLORS["gold"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~PAPER_COLORS["orange"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~PAPER_COLORS["purple"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 ]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 plt.rcParams.update(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"figure.dpi": 140,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"savefig.dpi": 300,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"figure.facecolor": "white",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"axes.facecolor": "white",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"axes.edgecolor": "#30343f",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"axes.labelcolor": "#20242c",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"axes.titlecolor": "#16191f",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"axes.linewidth": 0.9,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"axes.prop_cycle": cycler(color=LINE_COLORS),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"font.family": "DejaVu Serif",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"font.size": 10.5,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"xtick.color": "#30343f",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"ytick.color": "#30343f",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"xtick.direction": "out",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"ytick.direction": "out",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"xtick.major.size": 4,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"ytick.major.size": 4,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"xtick.major.width": 0.8,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"ytick.major.width": 0.8,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"legend.frameon": False,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"grid.color": "#cfd6df",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"grid.alpha": 0.28,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"savefig.bbox": "tight",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"savefig.pad_inches": 0.08,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 )\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def print_section(title):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Print a top-level section banner."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~line = "=" * LINE_WIDTH\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print(f"\\n\{line\}\\n\{title\}\\n\{line\}")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def print_subsection(title):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Print a compact subsection label."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print(f"\\n[\{title\}]")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def print_kv(label, value):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Print a simple key-value line."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print(f"\{label:<24\} \{value\}")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def print_status(message):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Print a single status line."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print(f"-> \{message\}")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def print_success(message="Completed."):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Print a success line."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~print(f"[ok] \{message\}")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def as_bool(value):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Coerce legacy on/off values and regular truthy values to bool."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if isinstance(value, bool):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return value\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if isinstance(value, str):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~normalized = value.strip().lower()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if normalized in \{"on", "true", "yes", "1"\}:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~return True\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if normalized in \{"off", "false", "no", "0"\}:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~return False\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return bool(value)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def style_axes(ax, title, xlabel, ylabel, *, grid=True):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Apply a consistent visual style to a plot axis."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.set_title(title, fontsize=12.4, fontweight="semibold", pad=8)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.set_xlabel(xlabel, fontsize=11)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.set_ylabel(ylabel, fontsize=11)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.set_facecolor("white")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if grid:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~ax.grid(True, linestyle="--", linewidth=0.8, alpha=0.28)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.spines["top"].set_visible(False)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.spines["right"].set_visible(False)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.spines["left"].set_alpha(0.45)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.spines["bottom"].set_alpha(0.45)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.tick_params(axis="both", which="major", labelsize=10)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def style_heatmap(ax, title, xlabel, ylabel):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Apply a publication-style layout to heatmap-like axes."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~style_axes(ax, title, xlabel, ylabel, grid=False)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def style_colorbar(colorbar, label):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Apply a polished style to a figure colorbar."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~colorbar.set_label(label, fontsize=10.5)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~colorbar.ax.tick_params(labelsize=9.5, width=0.7, length=3)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~colorbar.outline.set_alpha(0.25)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def add_series(ax, x, y, *, color, label=None, linewidth=1.8, alpha=0.95, fill=False):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Draw a polished line series with an optional translucent fill."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ax.plot(x, y, color=color, linewidth=linewidth, alpha=alpha, label=label)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if fill:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~ax.fill_between(x, y, color=color, alpha=0.06)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def humanize_text(value):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Convert identifiers to reader-friendly labels."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~text = str(value).replace("_", " ").strip()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return re.sub(r"\\s+", " ", text)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def make_plot_title(config, label, title):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Build compact, publication-style figure titles."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~modality = config.get("datainfo", \{\}).get("signal_display_name", "Signal")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~match = re.search(r"segment_(\\d+)", str(label))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if match:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~base = f"\{modality\} Segment \{int(match.group(1))\}"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~else:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~base = humanize_text(label)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return f"\{base\} \{title\}".strip()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _slugify_filename_part(value):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Convert arbitrary labels to filesystem-safe filename parts."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~text = re.sub(r"\\s+", "_", str(value).strip())\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~text = re.sub(r"[^\\w.\\-]+", "_", text, flags=re.UNICODE)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return text.strip("._") or "figure"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def build_figure_path(config, module_name, label, *, data_title=None, figure_name=None):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Build a consistent figure output path from runtime config."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~root = Path(config["fileinfo"].get("result_dir", "./result"))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if as_bool(config.get("output", \{\}).get("organize_by_modality", True)):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~modality = config.get("datainfo", \{\}).get("signal_display_name") or config.get("datainfo", \{\}).get("signal_type", "misc")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~root = root / _slugify_filename_part(str(modality).upper())\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~root = root / _slugify_filename_part(module_name)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~parts = [_slugify_filename_part(label)]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if data_title:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~parts.append(_slugify_filename_part(data_title))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if figure_name:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~parts.append(_slugify_filename_part(figure_name))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~figure_format = config.get("output", \{\}).get("figure_format", "png")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return root / f"\{'_'.join(parts)\}.\{figure_format\}"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def finish_figure(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fig,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~*,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config=None,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~module_name=None,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~label=None,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~data_title=None,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~figure_name=None,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~show=False,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~layout="tight",\par
+\pard\ql\li360\sa0\sb0\f2\fs16 ):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Finalize, optionally save, show, and close a figure."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if layout == "tight":\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~fig.tight_layout()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~elif layout == "constrained":\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~fig.set_constrained_layout(True)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~save_path = None\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if config is not None and as_bool(config.get("output", \{\}).get("save_figures", False)):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~if not module_name or not label:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~raise ValueError("module_name and label are required when save_figures is enabled.")\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~save_path = build_figure_path(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~config,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~module_name,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~label,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~data_title=data_title,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~figure_name=figure_name,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~os.makedirs(save_path.parent, exist_ok=True)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~fig.savefig(\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~save_path,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~dpi=int(config.get("output", \{\}).get("figure_dpi", 300)),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~facecolor=fig.get_facecolor(),\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~if show:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~plt.show()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~plt.close(fig)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return str(save_path) if save_path else None\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 14. tests/test_analysis_pipeline.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils import Analysis as analysis_module\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def test_analysis_dispatches_only_enabled_modules(monkeypatch):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~called = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~def _make_stub(name):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~def _stub(dataset, *args):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~called.append(name)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~return \{"segments": [\{"label": name, "count": len(dataset)\}]\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~return _stub\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~monkeypatch.setattr(analysis_module, "heartrate_analysis", _make_stub("heart_rate"))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~monkeypatch.setattr(analysis_module, "run_fft", _make_stub("fft"))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~monkeypatch.setattr(analysis_module, "run_stft", _make_stub("stft"))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~monkeypatch.setattr(analysis_module, "run_band_analysis", _make_stub("band"))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~monkeypatch.setattr(analysis_module, "run_freq_analysis", _make_stub("freq_analysis"))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"analysis": \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~"enabled_modules": ["fft", "band"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"datainfo": \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~"segment_labels": ["seg_1"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~result = analysis_module.run_analysis([[1.0, 2.0, 3.0]], "demo", config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert called == ["fft", "band"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert set(result["modules"].keys()) == \{"fft", "band"\}\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 15. tests/test_config.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from nm_config import nm_config\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def test_config_contains_required_defaults():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config = nm_config()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert config["dataset"]["signal_column"] == 2\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert config["analysis"]["enabled_modules"] == []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert config["analysis"]["rms_time"] > 0\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert config["analysis"]["rms_gap"] > 0\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert config["display"]["preprocess_show"] is True\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 16. tests/test_heartrate.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.Heartrate import _detect_r_peaks, heartrate_analysis\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _make_noisy_ecg(fs, duration_seconds, beat_times):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~time_axis = np.arange(0, duration_seconds, 1 / fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~signal = 0.08 * np.sin(2 * np.pi * 0.35 * time_axis)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~signal += 0.04 * np.sin(2 * np.pi * 0.12 * time_axis + 0.5)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for beat_time in beat_times:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal += -1.8 * np.exp(-0.5 * ((time_axis - beat_time) / 0.018) ** 2)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal += 0.35 * np.exp(-0.5 * ((time_axis - (beat_time - 0.16)) / 0.04) ** 2)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal += 0.45 * np.exp(-0.5 * ((time_axis - (beat_time + 0.22)) / 0.07) ** 2)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~rng = np.random.default_rng(42)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~signal += 0.03 * rng.standard_normal(len(time_axis))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~return signal\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def test_heartrate_analysis_detects_beats_from_noisy_inverted_ecg():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fs = 250\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~beat_times = np.arange(1.0, 9.1, 1.0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_signal = _make_noisy_ecg(fs, duration_seconds=10, beat_times=beat_times)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config = \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"datainfo": \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~"Fs": fs,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~"segment_labels": ["ecg_segment_1"],\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~"display": \{\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\~\~\~\~"heart_rate_show": False,\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~\},\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\}\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~result = heartrate_analysis([ecg_signal], config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert result["segments"][0]["detected"] is True\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~heart_rate = result["segments"][0]["heart_rate_bpm"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert len(heart_rate) >= 6\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert np.isclose(np.median(heart_rate), 60.0, atol=6.0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def test_detect_r_peaks_ignores_weaker_midcycle_artifacts():\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~fs = 250\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~time_axis = np.arange(0, 10, 1 / fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~beat_times = np.arange(1.0, 9.1, 1.0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~signal = np.zeros_like(time_axis)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for beat_time in beat_times:\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal += 2.4 * np.exp(-0.5 * ((time_axis - beat_time) / 0.018) ** 2)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~# Add a weaker broad bump that should not be counted as another R-peak.\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~signal += 0.75 * np.exp(-0.5 * ((time_axis - (beat_time + 0.34)) / 0.05) ** 2)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~peaks = _detect_r_peaks(signal, fs)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert len(peaks) == len(beat_times)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~detected_times = peaks / fs\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert np.allclose(detected_times, beat_times, atol=0.05)\par
+\pard\sa120\par
+\pard\ql\sb180\sa80\sl360\slmult1\f0\fs24\b 17. tests/test_load_dataset.py\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from datetime import datetime, timedelta\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 import numpy as np\par
+\pard\ql\li360\sa0\sb0\f2\fs16 import pandas as pd\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 from nm_config import nm_config\par
+\pard\ql\li360\sa0\sb0\f2\fs16 from utils.LoadDataset import load_dataset\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def _write_signal_csv(path, start_dt, values):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~"""Create a minimal headerless CSV test signal."""\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~rows = []\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for index, value in enumerate(values):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~timestamp = int((start_dt + timedelta(seconds=index)).timestamp() * 1000)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~rows.append([timestamp, index, value])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~pd.DataFrame(rows).to_csv(path, header=False, index=False)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def test_load_dataset_reads_headerless_csv_without_losing_first_row(tmp_path):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~data_dir = tmp_path / "ecg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~data_dir.mkdir()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~start_dt = datetime(2026, 1, 1, 12, 0, 0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~_write_signal_csv(data_dir / "single.csv", start_dt, [1.0, 2.0, 3.0])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config = nm_config()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["fileinfo"]["fullpath"] = str(data_dir)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["source_sampling_rate"] = 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["sampling_rate_scale"] = 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["segment_duration_seconds"] = 0\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~dataset, updated_config = load_dataset(config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert len(dataset) == 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert np.allclose(dataset[0], np.array([1.0, 2.0, 3.0]))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["datainfo"]["segment_labels"] == ["single_segment_1"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["datainfo"]["signal_type"] == "ecg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert "datalen" not in updated_config["datainfo"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def test_load_dataset_supports_time_slice_and_segmentation(tmp_path):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~data_dir = tmp_path / "eeg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~data_dir.mkdir()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~start_dt = datetime(2026, 1, 1, 17, 17, 9)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for idx in range(5):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~_write_signal_csv(data_dir / f"ch\{idx + 1\}.csv", start_dt, [idx + 1, idx + 2, idx + 3, idx + 4])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config = nm_config()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["fileinfo"]["fullpath"] = str(data_dir)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["source_sampling_rate"] = 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["sampling_rate_scale"] = 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["slice_enabled"] = True\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["slice_start"] = "17:17:10"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["slice_end"] = "17:17:12"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["segment_duration_seconds"] = 2\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~dataset, updated_config = load_dataset(config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert len(dataset) == 2\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert np.allclose(dataset[0], np.array([4.0, 5.0]))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert np.allclose(dataset[1], np.array([6.0]))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["datainfo"]["signal_type"] == "eeg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["datainfo"]["chcnt"] == 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["datainfo"]["source_channels"] == ["ch1", "ch2", "ch3", "ch4", "ch5"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert "datalen" not in updated_config["datainfo"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def test_load_dataset_auto_detects_eeg_and_averages_to_single_channel(tmp_path):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~data_dir = tmp_path / "eeg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~data_dir.mkdir()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~start_dt = datetime(2026, 1, 1, 9, 0, 0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~for idx in range(5):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~\~\~\~\~_write_signal_csv(data_dir / f"ch\{idx + 1\}.csv", start_dt, [idx + 1, idx + 2, idx + 3])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config = nm_config()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["fileinfo"]["fullpath"] = str(data_dir)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["source_sampling_rate"] = 100\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["sampling_rate_scale"] = 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~config["dataset"]["segment_duration_seconds"] = 0\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~dataset, updated_config = load_dataset(config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert len(dataset) == 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["datainfo"]["signal_type"] == "eeg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["datainfo"]["chcnt"] == 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["preprocess"]["bpfreq"] == [1, 60]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert updated_config["datainfo"]["chname"] == ["eeg_mean"]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert np.allclose(dataset[0], np.array([3.0, 4.0, 5.0]))\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 def test_load_dataset_auto_detects_ecg_and_emg_profiles(tmp_path):\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_dir = tmp_path / "ecg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~emg_dir = tmp_path / "emg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_dir.mkdir()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~emg_dir.mkdir()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~start_dt = datetime(2026, 1, 1, 10, 0, 0)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~_write_signal_csv(ecg_dir / "ecg.csv", start_dt, [1.0, 2.0, 1.5])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~_write_signal_csv(emg_dir / "emg.csv", start_dt, [3.0, 4.0, 5.0])\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_config = nm_config()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_config["fileinfo"]["fullpath"] = str(ecg_dir)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_config["dataset"]["source_sampling_rate"] = 1000\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_config["dataset"]["sampling_rate_scale"] = 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_config["dataset"]["segment_duration_seconds"] = 0\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~ecg_dataset, ecg_updated = load_dataset(ecg_config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~emg_config = nm_config()\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~emg_config["fileinfo"]["fullpath"] = str(emg_dir)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~emg_config["dataset"]["source_sampling_rate"] = 1000\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~emg_config["dataset"]["sampling_rate_scale"] = 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~emg_config["dataset"]["segment_duration_seconds"] = 0\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~emg_dataset, emg_updated = load_dataset(emg_config)\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert len(ecg_dataset) == 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert ecg_updated["datainfo"]["signal_type"] == "ecg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert ecg_updated["preprocess"]["bpfreq"] == [1, 10]\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert len(emg_dataset) == 1\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert emg_updated["datainfo"]["signal_type"] == "emg"\par
+\pard\ql\li360\sa0\sb0\f2\fs16 \~\~\~\~assert emg_updated["preprocess"]["bpfreq"] == [1, 250]\par
+\pard\sa120\par
+}

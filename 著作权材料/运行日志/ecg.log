@@ -1,0 +1,136 @@
+
+Fontconfig error: No writable cache directories
+	/opt/homebrew/var/cache/fontconfig
+	/Users/teddy/.cache/fontconfig
+	/Users/teddy/.fontconfig
+
+Fontconfig error: No writable cache directories
+	/opt/homebrew/var/cache/fontconfig
+	/Users/teddy/.cache/fontconfig
+	/Users/teddy/.fontconfig
+
+Fontconfig error: No writable cache directories
+	/opt/homebrew/var/cache/fontconfig
+	/Users/teddy/.cache/fontconfig
+	/Users/teddy/.fontconfig
+
+Fontconfig error: No writable cache directories
+	/opt/homebrew/var/cache/fontconfig
+	/Users/teddy/.cache/fontconfig
+	/Users/teddy/.fontconfig
+Matplotlib is building the font cache; this may take a moment.
+
+================================================================================
+LOAD DATASET
+================================================================================
+
+[Experiment Window]
+Start time               2024-06-26 16:57:17.220
+End time                 2024-06-26 17:29:32.174
+Duration                 0:32:14.954000
+
+[Resolved Profile]
+Signal modality          ECG (ecg)
+Source channels          C9_AB_19_D3_9A_F5-3-3
+Analysis channels        C9_AB_19_D3_9A_F5-3-3
+Band-pass                [1, 10]
+Sampling rate            992.0000 Hz
+Segment count            32
+Segment labels           C9_AB_19_D3_9A_F5-3-3_segment_1, C9_AB_19_D3_9A_F5-3-3_segment_2, C9_AB_19_D3_9A_F5-3-3_segment_3, C9_AB_19_D3_9A_F5-3-3_segment_4, C9_AB_19_D3_9A_F5-3-3_segment_5, C9_AB_19_D3_9A_F5-3-3_segment_6, C9_AB_19_D3_9A_F5-3-3_segment_7, C9_AB_19_D3_9A_F5-3-3_segment_8, C9_AB_19_D3_9A_F5-3-3_segment_9, C9_AB_19_D3_9A_F5-3-3_segment_10, C9_AB_19_D3_9A_F5-3-3_segment_11, C9_AB_19_D3_9A_F5-3-3_segment_12, C9_AB_19_D3_9A_F5-3-3_segment_13, C9_AB_19_D3_9A_F5-3-3_segment_14, C9_AB_19_D3_9A_F5-3-3_segment_15, C9_AB_19_D3_9A_F5-3-3_segment_16, C9_AB_19_D3_9A_F5-3-3_segment_17, C9_AB_19_D3_9A_F5-3-3_segment_18, C9_AB_19_D3_9A_F5-3-3_segment_19, C9_AB_19_D3_9A_F5-3-3_segment_20, C9_AB_19_D3_9A_F5-3-3_segment_21, C9_AB_19_D3_9A_F5-3-3_segment_22, C9_AB_19_D3_9A_F5-3-3_segment_23, C9_AB_19_D3_9A_F5-3-3_segment_24, C9_AB_19_D3_9A_F5-3-3_segment_25, C9_AB_19_D3_9A_F5-3-3_segment_26, C9_AB_19_D3_9A_F5-3-3_segment_27, C9_AB_19_D3_9A_F5-3-3_segment_28, C9_AB_19_D3_9A_F5-3-3_segment_29, C9_AB_19_D3_9A_F5-3-3_segment_30, C9_AB_19_D3_9A_F5-3-3_segment_31, C9_AB_19_D3_9A_F5-3-3_segment_32
+-> Dataset loading finished.
+[ok] Completed.
+
+================================================================================
+PREPROCESS
+================================================================================
+
+[Filter Setup]
+Band-pass range          [1, 10]
+Band-pass order          4
+Band-stop range          [48, 52]
+Band-stop order          4
+[ok] Preprocessing finished.
+
+================================================================================
+ANALYSIS
+================================================================================
+-> Running heart-rate analysis.
+
+[Heart Rate]
+-> Detecting R-peaks and computing HRV metrics.
+C9_AB_19_D3_9A_F5-3-3_segment_1 SDNN 60.71 ms
+C9_AB_19_D3_9A_F5-3-3_segment_1 RMSSD 33.04 ms
+C9_AB_19_D3_9A_F5-3-3_segment_2 SDNN 33.06 ms
+C9_AB_19_D3_9A_F5-3-3_segment_2 RMSSD 27.63 ms
+C9_AB_19_D3_9A_F5-3-3_segment_3 SDNN 65.18 ms
+C9_AB_19_D3_9A_F5-3-3_segment_3 RMSSD 36.95 ms
+C9_AB_19_D3_9A_F5-3-3_segment_4 SDNN 41.04 ms
+C9_AB_19_D3_9A_F5-3-3_segment_4 RMSSD 28.57 ms
+C9_AB_19_D3_9A_F5-3-3_segment_5 SDNN 39.94 ms
+C9_AB_19_D3_9A_F5-3-3_segment_5 RMSSD 24.68 ms
+C9_AB_19_D3_9A_F5-3-3_segment_6 SDNN 146.52 ms
+C9_AB_19_D3_9A_F5-3-3_segment_6 RMSSD 145.80 ms
+C9_AB_19_D3_9A_F5-3-3_segment_7 SDNN 169.48 ms
+C9_AB_19_D3_9A_F5-3-3_segment_7 RMSSD 225.37 ms
+C9_AB_19_D3_9A_F5-3-3_segment_8 SDNN 69.17 ms
+C9_AB_19_D3_9A_F5-3-3_segment_8 RMSSD 103.76 ms
+C9_AB_19_D3_9A_F5-3-3_segment_9 SDNN 49.33 ms
+C9_AB_19_D3_9A_F5-3-3_segment_9 RMSSD 57.52 ms
+C9_AB_19_D3_9A_F5-3-3_segment_10 SDNN 45.28 ms
+C9_AB_19_D3_9A_F5-3-3_segment_10 RMSSD 59.32 ms
+C9_AB_19_D3_9A_F5-3-3_segment_11 SDNN 60.53 ms
+C9_AB_19_D3_9A_F5-3-3_segment_11 RMSSD 78.55 ms
+C9_AB_19_D3_9A_F5-3-3_segment_12 SDNN 262.12 ms
+C9_AB_19_D3_9A_F5-3-3_segment_12 RMSSD 375.14 ms
+C9_AB_19_D3_9A_F5-3-3_segment_13 SDNN 80.76 ms
+C9_AB_19_D3_9A_F5-3-3_segment_13 RMSSD 90.92 ms
+C9_AB_19_D3_9A_F5-3-3_segment_14 SDNN 29.45 ms
+C9_AB_19_D3_9A_F5-3-3_segment_14 RMSSD 31.05 ms
+C9_AB_19_D3_9A_F5-3-3_segment_15 SDNN 32.88 ms
+C9_AB_19_D3_9A_F5-3-3_segment_15 RMSSD 35.19 ms
+C9_AB_19_D3_9A_F5-3-3_segment_16 SDNN 60.89 ms
+C9_AB_19_D3_9A_F5-3-3_segment_16 RMSSD 44.70 ms
+C9_AB_19_D3_9A_F5-3-3_segment_17 SDNN 38.28 ms
+C9_AB_19_D3_9A_F5-3-3_segment_17 RMSSD 38.46 ms
+C9_AB_19_D3_9A_F5-3-3_segment_18 SDNN 171.81 ms
+C9_AB_19_D3_9A_F5-3-3_segment_18 RMSSD 217.40 ms
+C9_AB_19_D3_9A_F5-3-3_segment_19 SDNN 117.21 ms
+C9_AB_19_D3_9A_F5-3-3_segment_19 RMSSD 131.90 ms
+C9_AB_19_D3_9A_F5-3-3_segment_20 SDNN 94.38 ms
+C9_AB_19_D3_9A_F5-3-3_segment_20 RMSSD 135.35 ms
+C9_AB_19_D3_9A_F5-3-3_segment_21 SDNN 76.39 ms
+C9_AB_19_D3_9A_F5-3-3_segment_21 RMSSD 95.69 ms
+C9_AB_19_D3_9A_F5-3-3_segment_22 SDNN 69.17 ms
+C9_AB_19_D3_9A_F5-3-3_segment_22 RMSSD 91.91 ms
+C9_AB_19_D3_9A_F5-3-3_segment_23 SDNN 1309.53 ms
+C9_AB_19_D3_9A_F5-3-3_segment_23 RMSSD 1798.73 ms
+C9_AB_19_D3_9A_F5-3-3_segment_24 SDNN 119.63 ms
+C9_AB_19_D3_9A_F5-3-3_segment_24 RMSSD 170.29 ms
+C9_AB_19_D3_9A_F5-3-3_segment_25 SDNN 45.71 ms
+C9_AB_19_D3_9A_F5-3-3_segment_25 RMSSD 28.16 ms
+C9_AB_19_D3_9A_F5-3-3_segment_26 SDNN 78.27 ms
+C9_AB_19_D3_9A_F5-3-3_segment_26 RMSSD 88.99 ms
+C9_AB_19_D3_9A_F5-3-3_segment_27 SDNN 94.99 ms
+C9_AB_19_D3_9A_F5-3-3_segment_27 RMSSD 134.03 ms
+C9_AB_19_D3_9A_F5-3-3_segment_28 SDNN 67.41 ms
+C9_AB_19_D3_9A_F5-3-3_segment_28 RMSSD 61.81 ms
+C9_AB_19_D3_9A_F5-3-3_segment_29 SDNN 46.50 ms
+C9_AB_19_D3_9A_F5-3-3_segment_29 RMSSD 19.85 ms
+C9_AB_19_D3_9A_F5-3-3_segment_30 SDNN 115.73 ms
+C9_AB_19_D3_9A_F5-3-3_segment_30 RMSSD 169.27 ms
+C9_AB_19_D3_9A_F5-3-3_segment_31 SDNN 85.11 ms
+C9_AB_19_D3_9A_F5-3-3_segment_31 RMSSD 107.03 ms
+C9_AB_19_D3_9A_F5-3-3_segment_32 SDNN 78.59 ms
+C9_AB_19_D3_9A_F5-3-3_segment_32 RMSSD 123.34 ms
+[ok] Heart-rate analysis finished.
+[ok] Analysis finished.
+D3_9A_F5-3-3_segment_29 SDNN 46.50 ms
+C9_AB_19_D3_9A_F5-3-3_segment_29 RMSSD 19.85 ms
+C9_AB_19_D3_9A_F5-3-3_segment_30 SDNN 115.73 ms
+C9_AB_19_D3_9A_F5-3-3_segment_30 RMSSD 169.27 ms
+C9_AB_19_D3_9A_F5-3-3_segment_31 SDNN 85.11 ms
+C9_AB_19_D3_9A_F5-3-3_segment_31 RMSSD 107.03 ms
+C9_AB_19_D3_9A_F5-3-3_segment_32 SDNN 78.59 ms
+C9_AB_19_D3_9A_F5-3-3_segment_32 RMSSD 123.34 ms
+[ok] Heart-rate analysis finished.
+[ok] Analysis finished.

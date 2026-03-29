@@ -1,0 +1,43 @@
+
+================================================================================
+LOAD DATASET
+================================================================================
+
+[Experiment Window]
+Start time               2024-06-26 16:57:17.220
+End time                 2024-06-26 16:57:29.315
+Duration                 0:00:12.095000
+
+[Resolved Profile]
+Signal modality          ECG (ecg)
+Source channels          C9_AB_19_D3_9A_F5-3-3
+Analysis channels        C9_AB_19_D3_9A_F5-3-3
+Band-pass                [1, 10]
+Sampling rate            992.0000 Hz
+Segment count            1
+Segment labels           C9_AB_19_D3_9A_F5-3-3_segment_1
+-> Dataset loading finished.
+[ok] Completed.
+
+================================================================================
+PREPROCESS
+================================================================================
+
+[Filter Setup]
+Band-pass range          [1, 10]
+Band-pass order          4
+Band-stop range          [48, 52]
+Band-stop order          4
+[ok] Preprocessing finished.
+
+================================================================================
+ANALYSIS
+================================================================================
+-> Running heart-rate analysis.
+
+[Heart Rate]
+-> Detecting R-peaks and computing HRV metrics.
+C9_AB_19_D3_9A_F5-3-3_segment_1 SDNN 44.55 ms
+C9_AB_19_D3_9A_F5-3-3_segment_1 RMSSD 46.55 ms
+[ok] Heart-rate analysis finished.
+[ok] Analysis finished.

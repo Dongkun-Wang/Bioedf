@@ -21,6 +21,15 @@ from utils.ui import (
 )
 
 
+BAND_LABELS = {
+    "theta": "Theta θ波",
+    "alpha": "Alpha α波",
+    "beta_low": "低频Beta β波",
+    "beta_high": "高频Beta β波",
+    "gamma": "Gamma γ波",
+}
+
+
 def run_band_analysis(dataset, data_title, config):
     """Compute EEG band-power metrics and derived concentration/relaxation indices."""
     fs = float(config["datainfo"]["Fs"])
@@ -96,7 +105,7 @@ def run_band_analysis(dataset, data_title, config):
                     times,
                     band_power,
                     color=band_colors[band_name],
-                    label=f"{humanize_text(band_name).title()} {band_range[0]}-{band_range[1]} Hz",
+                    label=f"{BAND_LABELS.get(band_name, humanize_text(band_name))} {band_range[0]}-{band_range[1]} Hz",
                     linewidth=1.6,
                 )
 
@@ -120,7 +129,7 @@ def run_band_analysis(dataset, data_title, config):
             metrics.to_csv(os.path.join(result_dir, f"{label}_{data_title}_band_metrics.csv"))
 
         if render_power:
-            style_axes(ax_power, make_plot_title(config, label, "Band Power"), "Time (s)", "Power")
+            style_axes(ax_power, make_plot_title(config, label, "Band Power"), "时间（秒）", "功率")
             ax_power.set_ylim(bottom=0)
             ax_power.legend(frameon=False, ncol=2)
             finish_figure(
@@ -140,7 +149,7 @@ def run_band_analysis(dataset, data_title, config):
                 ax_index,
                 metrics.index,
                 metrics["concentration"],
-                label="Concentration",
+                label="专注度",
                 color="#1f3c88",
                 linewidth=1.9,
             )
@@ -148,11 +157,11 @@ def run_band_analysis(dataset, data_title, config):
                 ax_index,
                 metrics.index,
                 metrics["relaxation"],
-                label="Relaxation",
+                label="放松度",
                 color="#4c956c",
                 linewidth=1.9,
             )
-            style_axes(ax_index, make_plot_title(config, label, "Derived Indices"), "Time (s)", "Index")
+            style_axes(ax_index, make_plot_title(config, label, "Derived Indices"), "时间（秒）", "指数")
             ax_index.set_ylim(bottom=0)
             ax_index.legend(frameon=False)
             finish_figure(

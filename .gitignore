@@ -9,4 +9,4 @@ __pycache__/
 data/
 docs/
 result/
-
+.frontend_workspace/

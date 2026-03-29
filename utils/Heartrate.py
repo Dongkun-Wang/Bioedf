@@ -133,7 +133,7 @@ def heartrate_analysis(dataset, config):
             # TODO: Visualization styling lives here so it can be tuned globally later.
             fig, ax = plt.subplots(figsize=(10.5, 4.5))
             add_series(ax, time_hr, heart_rate, color="#a63446", linewidth=2.0, fill=True)
-            style_axes(ax, make_plot_title(config, label, "Heart Rate"), "Time (s)", "Heart Rate (bpm)")
+            style_axes(ax, make_plot_title(config, label, "Heart Rate"), "时间（秒）", "心率（bpm）")
             ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
             finish_figure(
                 fig,

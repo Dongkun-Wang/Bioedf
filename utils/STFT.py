@@ -64,8 +64,8 @@ def run_stft(dataset, data_title, config):
                 vmax=vmax,
             )
             colorbar = fig_spec.colorbar(image, ax=ax_spec, pad=0.02, aspect=28)
-            style_colorbar(colorbar, "Power/Frequency (dB/Hz)")
-            style_heatmap(ax_spec, make_plot_title(config, label, "Spectrogram"), "Time (s)", "Frequency (Hz)")
+            style_colorbar(colorbar, "功率/频率（dB/Hz）")
+            style_heatmap(ax_spec, make_plot_title(config, label, "Spectrogram"), "时间（秒）", "频率（Hz）")
             finish_figure(
                 fig_spec,
                 config=config,

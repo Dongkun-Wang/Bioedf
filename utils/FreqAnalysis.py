@@ -77,7 +77,7 @@ def run_freq_analysis(dataset, data_title, config):
             )
             fig.suptitle(make_plot_title(config, label, "RMS and MDF"), fontsize=13.0, fontweight="semibold")
             add_series(ax_rms, time_s, rms, color="#6c5b7b", linewidth=1.9, fill=True)
-            style_axes(ax_rms, "RMS", "", "RMS")
+            style_axes(ax_rms, "RMS（均方根）", "", "RMS")
 
             add_series(
                 ax_mdf,
@@ -86,7 +86,7 @@ def run_freq_analysis(dataset, data_title, config):
                 color="#a8a4b8",
                 linewidth=1.1,
                 alpha=0.85,
-                label="Raw MDF",
+                label="原始MDF",
             )
             add_series(
                 ax_mdf,
@@ -94,9 +94,9 @@ def run_freq_analysis(dataset, data_title, config):
                 mdf_trend,
                 color="#c8553d",
                 linewidth=2.2,
-                label="Trend MDF",
+                label="趋势MDF",
             )
-            style_axes(ax_mdf, "MDF", "Time (s)", "Frequency (Hz)")
+            style_axes(ax_mdf, "MDF（中值频率）", "时间（秒）", "频率（Hz）")
             ax_mdf.legend(loc="upper right", frameon=False)
             finish_figure(
                 fig,

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>用于多模态生理信号的分析系统</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <p class="eyebrow">BIOSIGNAL ANALYSIS UI</p>
+          <h1>用于多模态生理信号的分析系统</h1>
+        </div>
+
+        <ol class="stepper" id="stepper">
+          <li data-step="1" class="active">
+            <span>01</span>
+            <div>
+              <strong>登录信息</strong>
+              <small>填写基本信息后进入分析流程</small>
+            </div>
+          </li>
+          <li data-step="2">
+            <span>02</span>
+            <div>
+              <strong>数据导入</strong>
+              <small>选择模态并拖拽 EDF 文件上传</small>
+            </div>
+          </li>
+          <li data-step="3">
+            <span>03</span>
+            <div>
+              <strong>功能确认</strong>
+              <small>根据模态自动列出对应分析功能</small>
+            </div>
+          </li>
+          <li data-step="4">
+            <span>04</span>
+            <div>
+              <strong>执行与结果</strong>
+              <small>查看终端日志与分析结果图</small>
+            </div>
+          </li>
+        </ol>
+
+        <section class="summary-card">
+          <div class="summary-header">
+            <h2>当前会话</h2>
+            <span id="sessionBadge">未开始</span>
+          </div>
+          <dl id="sessionSummary">
+            <div>
+              <dt>姓名</dt>
+              <dd>未填写</dd>
+            </div>
+            <div>
+              <dt>性别</dt>
+              <dd>未填写</dd>
+            </div>
+            <div>
+              <dt>年龄</dt>
+              <dd>未填写</dd>
+            </div>
+            <div>
+              <dt>模态</dt>
+              <dd>未选择</dd>
+            </div>
+            <div>
+              <dt>上传文件</dt>
+              <dd>0</dd>
+            </div>
+          </dl>
+        </section>
+      </aside>
+
+      <main class="main-panel">
+        <section class="panel stage active" data-stage="1">
+          <div class="panel-head">
+            <p class="eyebrow">STEP 1</p>
+            <h2>登录界面</h2>
+            <p>无需账号密码，仅需填写用户基本信息即可继续。</p>
+          </div>
+
+          <form id="loginForm" class="form-grid">
+            <label>
+              <span>用户姓名</span>
+              <input type="text" id="userName" placeholder="请输入姓名" required />
+            </label>
+            <label>
+              <span>性别</span>
+              <select id="userGender" required>
+                <option value="">请选择</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+              </select>
+            </label>
+            <label>
+              <span>年龄</span>
+              <input type="number" id="userAge" min="1" max="120" placeholder="请输入年龄" required />
+            </label>
+          </form>
+
+          <div class="panel-actions">
+            <button class="primary-button" id="loginNextBtn">下一步</button>
+          </div>
+        </section>
+
+        <section class="panel stage" data-stage="2">
+          <div class="panel-head">
+            <p class="eyebrow">STEP 2</p>
+            <h2>数据导入</h2>
+            <p>
+              当前系统只能识别 <strong>EDF</strong> 文件。请先选择模态，再将对应数据拖拽到下方区域。
+            </p>
+          </div>
+
+          <div class="modality-grid" id="modalityGrid"></div>
+
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept=".edf" multiple hidden />
+            <div class="dropzone-copy">
+              <p class="dropzone-title">拖拽 EDF 文件到这里</p>
+              <p class="dropzone-subtitle">或者点击这里选择文件</p>
+              <span id="dropzoneHint">请先选择模态</span>
+            </div>
+          </div>
+
+          <div class="file-list-card">
+            <div class="file-list-head">
+              <h3>已识别文件</h3>
+              <span id="fileCounter">0 个文件</span>
+            </div>
+            <ul id="fileList" class="file-list empty">
+              <li>尚未上传文件</li>
+            </ul>
+          </div>
+
+          <div class="panel-actions">
+            <button class="ghost-button" data-back="1">返回上一步</button>
+            <button class="primary-button" id="uploadNextBtn" disabled>下一步</button>
+          </div>
+        </section>
+
+        <section class="panel stage" data-stage="3">
+          <div class="panel-head">
+            <p class="eyebrow">STEP 3</p>
+            <h2>功能选择</h2>
+            <p>以下分析功能会根据当前模态默认全部开启。你也可以手动关闭不需要的模块，系统只会运行已开启的功能并生成对应结果图。</p>
+          </div>
+
+          <div class="feature-list" id="featureList"></div>
+
+          <div class="panel-actions">
+            <button class="ghost-button" data-back="2">返回上一步</button>
+            <button class="primary-button" id="runAnalysisBtn">确定并开始分析</button>
+          </div>
+        </section>
+
+        <section class="panel stage results-stage" data-stage="4">
+          <div class="panel-head">
+            <p class="eyebrow">STEP 4</p>
+            <h2>执行与结果展示</h2>
+            <p>这里接入现有分析流程，从终端运行日志开始展示，并自动汇总输出图像。</p>
+          </div>
+
+          <div class="run-status-row">
+            <div class="run-pill" id="runStatusPill">待运行</div>
+            <div class="run-note" id="runStatusText">点击“确定并开始分析”后，这里会显示实时状态。</div>
+          </div>
+
+          <section class="analysis-card">
+            <div class="analysis-head">
+              <div>
+                <h3>分析摘要</h3>
+              </div>
+              <span id="summaryBadge" class="summary-badge">等待分析</span>
+            </div>
+            <div id="analysisSummary" class="analysis-summary-grid">
+              <article class="summary-tile empty">
+                <span>状态</span>
+                <strong>等待分析开始</strong>
+              </article>
+            </div>
+            <div id="analysisHighlights" class="analysis-highlight-list empty">
+              <p>分析完成后，这里会自动提炼关键结果信息。</p>
+            </div>
+          </section>
+
+          <section class="gallery-card gallery-card-expanded">
+            <div class="gallery-head">
+              <h3>分析结果图</h3>
+              <span id="galleryCounter">0 张图</span>
+            </div>
+            <div id="galleryGrid" class="gallery-grid empty">
+              <p>分析完成后将在这里展示结果图片。</p>
+            </div>
+          </section>
+
+          <div class="panel-actions">
+            <button class="ghost-button" data-back="3">返回上一步</button>
+            <button class="primary-button" id="restartBtn">重新开始新会话</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div id="lightbox" class="lightbox" hidden>
+      <div class="lightbox-backdrop" data-lightbox-close></div>
+      <div class="lightbox-dialog" role="dialog" aria-modal="true" aria-label="结果图放大预览">
+        <button type="button" id="lightboxClose" class="lightbox-close" aria-label="关闭预览">×</button>
+        <div class="lightbox-image-wrap">
+          <img id="lightboxImage" alt="" />
+        </div>
+        <p id="lightboxCaption" class="lightbox-caption"></p>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

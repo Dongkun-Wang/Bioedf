@@ -80,7 +80,7 @@ def preprocess_dataset(config, dataset, show=None, saveon=None):
             # TODO: Visualization styling lives here so it can be tuned globally later.
             fig, ax = plt.subplots(figsize=(12, 4.5))
             add_series(ax, timeline, filtered_signal, color="#1f3c88", linewidth=1.5)
-            style_axes(ax, make_plot_title(config, label, "Filtered Signal"), "Time (s)", "Amplitude")
+            style_axes(ax, make_plot_title(config, label, "Filtered Signal"), "时间（秒）", "幅值")
             finish_figure(
                 fig,
                 config=config,
