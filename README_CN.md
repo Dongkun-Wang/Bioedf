@@ -46,8 +46,16 @@ uv sync
 
 ### 4. 启动前端
 
+macOS / Linux:
+
 ```bash
 .venv/bin/python frontend_server.py
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe frontend_server.py
 ```
 
 浏览器打开：
@@ -96,25 +104,51 @@ uv sync
 
 分析单个 EDF 文件：
 
+macOS / Linux:
+
 ```bash
 .venv/bin/python main.py --input /path/to/your_signal.edf --no-display --save-figures
 ```
 
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe main.py --input C:\path\to\your_signal.edf --no-display --save-figures
+```
+
 启动前端：
+
+macOS / Linux:
 
 ```bash
 .venv/bin/python frontend_server.py
 ```
 
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe frontend_server.py
+```
+
 运行测试：
+
+macOS / Linux:
 
 ```bash
 .venv/bin/python -m pytest -q
 ```
 
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
 ## 时间窗口裁剪
 
 如果只想分析记录中的一小段时间，可以这样运行：
+
+macOS / Linux:
 
 ```bash
 .venv/bin/python main.py \
@@ -122,6 +156,17 @@ uv sync
   --slice-start "13:48:12" \
   --slice-end "13:48:20" \
   --no-display \
+  --save-figures
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe main.py `
+  --input .\data_example\脑电 `
+  --slice-start "13:48:12" `
+  --slice-end "13:48:20" `
+  --no-display `
   --save-figures
 ```
 
