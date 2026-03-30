@@ -19,7 +19,7 @@ Bioedf 是一个面向 EEG、ECG、EMG 的本地 EDF 生理信号分析项目，
 ### 1. 下载代码
 
 ```bash
-git clone git@github.com:Dongkun-Wang/Bioedf.git Bioedf
+git clone https://github.com/Dongkun-Wang/Bioedf.git Bioedf
 cd Bioedf
 ```
 

@@ -19,7 +19,7 @@ Bioedf is a local EDF biosignal analysis project for EEG, ECG, and EMG. It suppo
 ### 1. Get the code
 
 ```bash
-git clone git@github.com:Dongkun-Wang/Bioedf.git Bioedf
+git clone https://github.com/Dongkun-Wang/Bioedf.git Bioedf
 cd Bioedf
 ```
 
