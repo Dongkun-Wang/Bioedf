@@ -285,6 +285,12 @@ class FrontendHandler(SimpleHTTPRequestHandler):
     def log_message(self, format: str, *args: Any) -> None:
         return None
 
+    def end_headers(self) -> None:
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
+
     def _send_json(self, payload: dict[str, Any], status: int = 200) -> None:
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
@@ -413,7 +419,10 @@ class FrontendHandler(SimpleHTTPRequestHandler):
                     return
                 session = SESSION_STORE.get(session_id)
                 allowed_modules = set(session.get("allowed_modules", []))
-                selected_modules = [module for module in modules if module in allowed_modules] or list(allowed_modules)
+                if not isinstance(modules, list) or not modules or any(module not in allowed_modules for module in modules):
+                    self._handle_api_error("请选择至少一个有效的分析模块。")
+                    return
+                selected_modules = list(dict.fromkeys(modules))
                 SESSION_STORE.update(session_id, status="running", error=None, result_images=[], log="")
                 worker = threading.Thread(
                     target=_run_session_analysis,

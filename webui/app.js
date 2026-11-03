@@ -25,6 +25,8 @@ const nodes = {
   summaryBadge: document.getElementById("summaryBadge"),
   galleryGrid: document.getElementById("galleryGrid"),
   galleryCounter: document.getElementById("galleryCounter"),
+  interpretationContent: document.getElementById("interpretationContent"),
+  interpretBadge: document.getElementById("interpretBadge"),
   lightbox: document.getElementById("lightbox"),
   lightboxImage: document.getElementById("lightboxImage"),
   lightboxCaption: document.getElementById("lightboxCaption"),
@@ -38,6 +40,65 @@ const nodes = {
   uploadNextBtn: document.getElementById("uploadNextBtn"),
   runAnalysisBtn: document.getElementById("runAnalysisBtn"),
   restartBtn: document.getElementById("restartBtn"),
+};
+
+const INTERPRETATION_LIBRARY = {
+  common: {
+    title: "通用阅读方式",
+    points: [
+      "先看整体趋势，再看局部异常。稳定、平滑、规律的变化通常更可信；突发尖峰、断裂、过于零散的变化需要结合原始信号和采集过程判断。",
+      "优先和同一人的前后数据做比较。生理信号个体差异较大，单次绝对数值有参考意义，但连续变化通常更能说明问题。",
+      "如果多张图结论一致，判断通常更稳；如果不同图之间相互矛盾，需要回到采样质量、运动伪差和电极接触情况进一步确认。",
+    ],
+  },
+  eeg: {
+    band: {
+      title: "脑电频带功率与指标图",
+      points: [
+        "频带功率图主要看 Theta、Alpha、Beta、Gamma 各频段的能量分布。某一频段明显升高，说明该频段在当前时段更活跃。",
+        "一般来说，Alpha 相对更高常见于放松、安静闭眼等状态；Beta 相对更高常见于注意集中、认知负荷增加或紧张状态。",
+        "频带功率受个体、任务、眼部和肌肉活动等因素影响，不能仅凭某个频带判断疲劳或注意力。多个频段同时剧烈波动时，应检查噪声和动作干扰。",
+        "指标图展示基于频带计算的相对指标，可用于同一采集条件下的趋势比较，不能直接认定专注或放松状态。",
+      ],
+    },
+  },
+  ecg: {
+    heart_rate: {
+      title: "心率与 HRV 趋势图",
+      points: [
+        "趋势图主要看心率、RR 间期或 HRV 指标是否稳定。节律均匀、波动适中通常说明心脏节律较稳定。",
+        "心率持续升高常见于活动、紧张、应激或负荷增加；心率逐步下降常见于放松、恢复或活动结束后。",
+        "SDNN、RMSSD 描述心搏间期的波动，受记录时长、呼吸、年龄和异常心搏等影响；短记录不宜直接判断疲劳或恢复状态。",
+        "如果曲线中出现不规则突跳、节律突然紊乱或峰值识别明显异常，需要结合原始心电波形再判断，避免把噪声当成生理变化。",
+      ],
+    },
+  },
+  emg: {
+    fft: {
+      title: "FFT 频谱图",
+      points: [
+        "频谱图主要看能量集中在哪些频率。主峰越明显，说明该频率附近的肌电活动越突出。",
+        "持续稳定用力时，频谱向低频移动可能与疲劳有关，也可能受动作、电极和噪声影响；不能单凭高频成分判断用力大小。",
+        "频谱分布很宽且杂乱，可能是复杂肌群活动，也可能是噪声偏多，需要结合时频图和原始波形一起看。",
+      ],
+    },
+    stft: {
+      title: "STFT 时频图",
+      points: [
+        "时频图横轴看时间、纵轴看频率、颜色看能量强弱。颜色越亮，表示该时刻该频率范围内的活动越强。",
+        "如果亮区持续时间长，通常表示肌肉处于持续用力状态；如果亮区呈短促爆发，通常表示瞬时收缩或动作切换。",
+        "亮区逐渐向低频移动，常见于疲劳发展；如果高低频成分交替明显，说明动作节律或用力模式在变化。",
+      ],
+    },
+    freq_analysis: {
+      title: "频域指标分析图",
+      points: [
+        "RMS 反映肌电幅值强弱，通常可理解为用力程度或肌肉招募强度。RMS 越高，往往说明当下肌肉激活越强。",
+        "RMS 和 MDF 分别反映肌电幅值与频谱中位频率；持续稳定收缩时，MDF 下降可能与疲劳有关，也可能受到采集条件影响。",
+        "RMS 上升并伴随 MDF 下降可作为进一步观察的线索，不能单独用于判定疲劳；应结合动作、采集质量和个人基线。",
+      ],
+    },
+  },
 };
 
 function showToast(message) {
@@ -363,6 +424,69 @@ function setSummaryBadge(status) {
   nodes.summaryBadge.textContent = map[status] || "处理中";
 }
 
+function setInterpretBadge(status) {
+  nodes.interpretBadge.className = "interpret-badge";
+  const map = {
+    draft: "等待分析",
+    uploaded: "等待运行",
+    running: "生成中",
+    completed: "辅助理解已生成",
+    error: "无法生成",
+  };
+  if (status) {
+    nodes.interpretBadge.classList.add(status);
+  }
+  nodes.interpretBadge.textContent = map[status] || "处理中";
+}
+
+function renderInterpretation(session = null) {
+  const modality = state.selectedModality;
+  const selectedSet = new Set(state.selectedModules);
+
+  if (!modality) {
+    nodes.interpretationContent.className = "interpretation-content empty";
+    nodes.interpretationContent.innerHTML = "<p>请选择模态并完成分析后，这里会显示对应图像的中文解读，帮助非专业用户快速理解图像含义。</p>";
+    return;
+  }
+
+  const blocks = [INTERPRETATION_LIBRARY.common];
+  const modalityMap = INTERPRETATION_LIBRARY[modality] || {};
+  Object.entries(modalityMap).forEach(([key, value]) => {
+    if (selectedSet.has(key)) {
+      blocks.push(value);
+    }
+  });
+
+  if (!blocks.length || (session?.status !== "completed" && session?.status !== "running" && session?.status !== "uploaded")) {
+    nodes.interpretationContent.className = "interpretation-content empty";
+    nodes.interpretationContent.innerHTML = "<p>分析完成后，这里会根据当前模态和分析模块，用中文说明每张图该怎么看，以及图中变化通常代表什么，帮助非专业用户快速理解结果。</p>";
+    return;
+  }
+
+  const modalityLabel = state.config?.modalities?.[modality]?.label || modality.toUpperCase();
+  nodes.interpretationContent.className = "interpretation-content";
+  nodes.interpretationContent.innerHTML = `
+    <div class="interpret-intro">
+      <p><strong>${escapeHtml(modalityLabel)}</strong> 的结果图建议按“先看整体趋势，再看局部异常，再结合摘要指标”的顺序阅读。下面是当前页面中这些图的重点解读方式。</p>
+    </div>
+    ${blocks
+      .map(
+        (block) => `
+        <article class="interpret-block">
+          <h4>${escapeHtml(block.title)}</h4>
+          <ul>
+            ${block.points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}
+          </ul>
+        </article>
+      `,
+      )
+      .join("")}
+    <div class="interpret-footnote">
+      <p>以上说明用于辅助理解图像趋势，不能替代专业医学诊断。若图中出现明显异常跳变、节律紊乱或与实际状态不符的结果，建议优先检查采集质量、动作伪差与电极接触情况。</p>
+    </div>
+  `;
+}
+
 function renderAnalysisSummary(session = null) {
   const parsed = parseSessionLog(session?.log || "");
   const fallbackModality = state.selectedModality ? state.config.modalities[state.selectedModality].label : "待识别";
@@ -416,6 +540,7 @@ function renderAnalysisSummary(session = null) {
     parsed.sdnn ? `SDNN：${parsed.sdnn}` : "",
     parsed.rmssd ? `RMSSD：${parsed.rmssd}` : "",
     session?.result_images?.length ? `结果图数量：${session.result_images.length} 张` : "",
+    session?.status === "completed" ? "页面最下方已生成“辅助理解与结果解读”，可结合结果图一起阅读" : "",
   ].filter(Boolean);
 
   if (!highlights.length) {
@@ -502,7 +627,9 @@ function applyPreviewState() {
   }
 
   setSummaryBadge(state.session.status);
+  setInterpretBadge(state.session.status);
   renderAnalysisSummary(state.session);
+  renderInterpretation(state.session);
 
   setStep(preview.step);
   return true;
@@ -594,10 +721,14 @@ async function startAnalysis() {
   renderGallery([]);
   setRunStatus("running", "正在调用现有分析流程，请稍候。");
   setSummaryBadge("running");
+  setInterpretBadge("running");
   renderAnalysisSummary({
     status: "running",
     log: "",
     result_images: [],
+  });
+  renderInterpretation({
+    status: "running",
   });
 
   const modules = [...state.selectedModules];
@@ -609,6 +740,8 @@ async function startAnalysis() {
   const payload = await response.json();
   if (!payload.ok) {
     setRunStatus("error", payload.error || "分析启动失败。");
+    setSummaryBadge("error");
+    setInterpretBadge("error");
     showToast(payload.error || "分析启动失败。");
     return;
   }
@@ -634,12 +767,14 @@ async function refreshSession() {
   state.session = payload.session;
   updateSummary();
   setSummaryBadge(state.session.status);
+  setInterpretBadge(state.session.status);
   renderAnalysisSummary(state.session);
+  renderInterpretation(state.session);
 
   if (state.session.status === "running") {
     setRunStatus("running", "系统正在执行现有分析流程，日志会实时刷新。");
   } else if (state.session.status === "completed") {
-    setRunStatus("completed", "分析完成，结果图已汇总展示。");
+    setRunStatus("completed", "分析完成，结果图已汇总展示，页面最下方还提供了辅助理解说明。");
     renderGallery(state.session.result_images || []);
     window.clearInterval(state.pollTimer);
   } else if (state.session.status === "error") {
@@ -667,8 +802,10 @@ function resetApp() {
   nodes.dropzoneHint.textContent = "请先选择模态";
   setRunStatus("draft", "点击“确定并开始分析”后，这里会显示实时状态。");
   setSummaryBadge("draft");
+  setInterpretBadge("draft");
   renderGallery([]);
   renderAnalysisSummary();
+  renderInterpretation();
   renderFiles();
   renderFeatures();
   renderModalities();
@@ -758,8 +895,10 @@ async function bootstrap() {
   renderGallery([]);
   setRunStatus("draft", "点击“确定并开始分析”后，这里会显示实时状态。");
   setSummaryBadge("draft");
+  setInterpretBadge("draft");
   updateSummary();
   renderAnalysisSummary();
+  renderInterpretation();
   applyPreviewState();
   bindEvents();
 }
